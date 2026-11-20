@@ -31,3 +31,14 @@ Sits in the upper-right corner of the arena photo, angled toward the court, with
 - The optional WebGL 3D arena scene (desktop only, progressive enhancement) is **not** ported; the image-based backdrop (the site's own fallback mode) is used.
 - `/api/inquiry` delivery is a new implementation (Resend). Without `RESEND_API_KEY` + `INQUIRY_FROM_EMAIL` submissions are only logged server-side.
 - The Dudoy chat points at `https://dudoy.coachatriplethreat.com/chat` (existing service); built-in answers are the fallback.
+
+## Deploy to Cloudflare Workers (vinext)
+The app runs on Cloudflare Workers via [vinext](https://github.com/cloudflare/vinext) (Next.js API on Vite). Config: `vite.config.ts`, `cloudflare.config.ts`
+(Workers Response Store cache in self-contained mode + Cloudflare Images binding).
+```bash
+npm run build:vinext     # production build (.cloudflare/output)
+npm run start:vinext     # preview in the local Workers runtime
+npm run deploy:vinext    # build + deploy (needs `cf auth login` / a Cloudflare API token)
+```
+Set env vars as Worker secrets/vars (see `.env.example`), e.g. `RESEND_API_KEY`, `INQUIRY_FROM_EMAIL`.
+`npm run dev` / `npm run build` still run plain Next.js.
