@@ -12,6 +12,8 @@ export default defineConfig({
     name: "ca-website",
     entrypoint: "vinext/server/fetch-handler",
     compatibilityDate: "2026-11-20",
+    // Served at this hostname (Worker Custom Domain). Hostname must have no DNS record of its own.
+    domains: ["v3.coachatriplethreat.com"],
     assets: {
       htmlHandling: "none",
       notFoundHandling: "none",
