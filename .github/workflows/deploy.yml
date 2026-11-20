@@ -23,4 +23,4 @@ jobs:
         run: npm run deploy:vinext
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_ACCOUNT_ID: 49828bb26f248a5e3d803f3422dea6c0 # not secret; the repo secret had stray characters

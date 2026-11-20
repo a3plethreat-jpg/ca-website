@@ -12,8 +12,9 @@ export default defineConfig({
     name: "ca-website",
     entrypoint: "vinext/server/fetch-handler",
     compatibilityDate: "2026-11-20",
-    // Served at this hostname (Worker Custom Domain). Hostname must have no DNS record of its own.
-    domains: ["v3.coachatriplethreat.com"],
+    // The custom domain (coachatriplethreat.com) is attached separately in the Cloudflare dashboard/API,
+    // because the apex was previously served by a Pages project.
+    domains: [],
     assets: {
       htmlHandling: "none",
       notFoundHandling: "none",
