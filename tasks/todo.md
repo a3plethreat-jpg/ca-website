@@ -7,7 +7,7 @@
 - [x] Verified: build + typecheck clean; 19 feature checks pass (nav, live screen, expand, coach profile, gallery filter/lightbox, Dudoy, form validation/guardian/submit, mobile menu)
 
 ## Deploy
-- [x] GitHub workflow deploys to the `ca-website` Worker (token cleaned + verified before deploy)
+- [x] GitHub workflow deploys to the `ca-website` Worker (token cleaned + verified before deploy; token re-saved)
 - [ ] Move `coachatriplethreat.com` from the old Pages project to the `ca-website` Worker
 
 ## Next
