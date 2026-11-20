@@ -42,3 +42,6 @@ npm run deploy:vinext    # build + deploy (needs `cf auth login` / a Cloudflare 
 ```
 Set env vars as Worker secrets/vars (see `.env.example`), e.g. `RESEND_API_KEY`, `INQUIRY_FROM_EMAIL`.
 `npm run dev` / `npm run build` still run plain Next.js.
+
+### Automatic deploys (GitHub Actions)
+`.github/workflows/deploy.yml` deploys on every push to `main` (or run it manually from the Actions tab). Add two repository secrets (Settings -> Secrets and variables -> Actions): `CLOUDFLARE_API_TOKEN` (permissions: Workers Scripts: Edit, Workers R2 Storage: Edit, Account Settings: Read, plus Workers Routes: Edit and DNS: Edit for the zone) and `CLOUDFLARE_ACCOUNT_ID`. The site is attached to `v3.coachatriplethreat.com` (see `domains` in `cloudflare.config.ts`).
