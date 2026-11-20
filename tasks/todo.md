@@ -6,6 +6,10 @@
 - [x] Move live screen to the arena's upper-right corner, angled to the court, ~1.4x bigger, broadcast overlays
 - [x] Verified: build + typecheck clean; 19 feature checks pass (nav, live screen, expand, coach profile, gallery filter/lightbox, Dudoy, form validation/guardian/submit, mobile menu)
 
+## Deploy
+- [x] GitHub workflow deploys to the `ca-website` Worker (token cleaned + verified before deploy)
+- [ ] Move `coachatriplethreat.com` from the old Pages project to the `ca-website` Worker
+
 ## Next
 - [ ] Sponsors logo section (need logo files, names, links)
 - [ ] Shirt store (checkout method, prices, sizes, currency; art in Pagesite repo)
