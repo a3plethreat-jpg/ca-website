@@ -1,0 +1,40 @@
+# Render Blueprint: Render → New → Blueprint → pick this repo.
+# Secrets marked `sync: false` are not stored here; Render asks for their values when the Blueprint is created.
+services:
+  - type: web
+    name: ca-website
+    runtime: node
+    # "free" sleeps after ~15 min idle (≈30 s cold start). Use "starter" for the live site.
+    plan: free
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+
+      # ---- Contact / inquiry form (app/api/inquiry/route.ts) ----
+      # Sent with Resend (https://resend.com). Without RESEND_API_KEY + INQUIRY_FROM_EMAIL,
+      # submissions are only logged on the server, not emailed.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: INQUIRY_FROM_EMAIL # a sender on a domain verified in Resend, e.g. inquiries@coachatriplethreat.com
+        sync: false
+      - key: INQUIRY_TO_EMAIL # where inquiries are delivered
+        value: info@coachatriplethreat.com
+
+      # ---- Public site settings (all optional; defaults live in app/lib/content.ts) ----
+      - key: NEXT_PUBLIC_DUDOY_CHAT_URL
+        value: https://dudoy.coachatriplethreat.com/chat
+      - key: NEXT_PUBLIC_CONTACT_EMAIL
+        sync: false
+      - key: NEXT_PUBLIC_CONTACT_WHATSAPP
+        sync: false
+      - key: NEXT_PUBLIC_LIVE_STREAM_URL
+        sync: false
+
+      # ---- Online merch ----
+      # Not built yet (see tasks/todo.md "Shirt store"). Its checkout settings go here once the
+      # store and payment method are chosen.
