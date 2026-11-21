@@ -139,14 +139,16 @@ export const DUDOY_CHAT_URL =
  * - Otherwise it plays the recorded game clips, styled as a broadcast, with the badge text below.
  */
 export const liveScreen = {
-  streamUrl: process.env.NEXT_PUBLIC_LIVE_STREAM_URL ?? "",
+  // A real live stream (YouTube/Facebook) set in NEXT_PUBLIC_LIVE_STREAM_URL takes over the screen with a LIVE badge.
+  // Otherwise the screen embeds this recorded Facebook video (NYBL Bulacan Season 5) with the LIVE REPLAY badge.
+  streamUrl: process.env.NEXT_PUBLIC_LIVE_STREAM_URL || "https://www.facebook.com/watch/?v=1684922109712721",
+  streamIsLive: Boolean(process.env.NEXT_PUBLIC_LIVE_STREAM_URL),
   channel: "TRIPLE THREAT TV",
   badgeLive: "LIVE",
   badgeReplay: "LIVE REPLAY",
   // played in order, then repeats from the start
   clips: [
     { src: "/clips/highlight-17u.mp4", poster: "/clips/highlight-17u.webp" },
-    { src: "/clips/nybl-s5-bulacan.mp4", poster: "/clips/nybl-s5-bulacan.webp" }, // NYBL Bulacan Season 5 Invitational Cup
   ],
   ticker: "17U CHAMPIONS · NYBL SEASON 4 INVITATIONAL CUP · NYBL BULACAN SEASON 5 INVITATIONAL CUP · KBA D-LEAGUE 2026 CHAMPIONS · PLAY HARD. STAY TRUE.",
 };

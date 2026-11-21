@@ -16,8 +16,14 @@ function safeEmbed(raw: string): string | null {
       u.searchParams.set("playsinline", "1");
     }
     if (u.hostname.includes("facebook")) {
-      u.searchParams.set("autoplay", "true");
-      u.searchParams.set("mute", "true");
+      // A normal video/watch/share link can't be framed; wrap it in Facebook's embed player.
+      const player = u.pathname.startsWith("/plugins/video.php")
+        ? u
+        : new URL(`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(u.toString())}`);
+      player.searchParams.set("show_text", "false");
+      player.searchParams.set("autoplay", "true");
+      player.searchParams.set("mute", "true");
+      return player.toString();
     }
     return u.toString();
   } catch {
@@ -173,7 +179,7 @@ export default function LiveScreen() {
         <div aria-hidden className="pointer-events-none absolute inset-0 text-[clamp(.55rem,.85vw,.8rem)]">
           <span className="display absolute left-[3%] top-[5%] flex items-center gap-[.5em] rounded-[.2em] bg-brand-red px-[.7em] py-[.2em] tracking-widest text-white shadow-[0_0_14px_rgba(231,25,32,.7)]">
             <span className="h-[.6em] w-[.6em] animate-pulse rounded-full bg-white" />
-            {embed ? liveScreen.badgeLive : liveScreen.badgeReplay}
+            {embed && liveScreen.streamIsLive ? liveScreen.badgeLive : liveScreen.badgeReplay}
           </span>
           <span className="display absolute right-[3%] top-[5%] flex items-center gap-[.5em] rounded-[.2em] bg-black/65 px-[.7em] py-[.2em] tracking-[.18em] text-white ring-1 ring-white/25">
             {/* eslint-disable-next-line @next/next/no-img-element */}
