@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { liveScreen } from "../lib/content";
+import { gameDay, liveScreen } from "../lib/content";
 
 /** Only allow embeds from known live-stream hosts; force muted autoplay. */
 function safeEmbed(raw: string): string | null {
@@ -132,7 +132,24 @@ export default function LiveScreen() {
     }
   };
 
-  const ticker = `${liveScreen.ticker}  ·  `;
+  // Game day: today's matchups lead the ticker and the next one shows as "UP NEXT" (Philippine time, client only).
+  const [today, setToday] = useState<{ on: boolean; next?: (typeof gameDay.games)[number] }>({ on: false });
+  useEffect(() => {
+    const tick = () => {
+      const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+      const ymd = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+      const hm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      setToday({ on: ymd === gameDay.date, next: gameDay.games.find((g) => g.time > hm) });
+    };
+    tick();
+    const t = window.setInterval(tick, 60_000);
+    return () => window.clearInterval(t);
+  }, []);
+  const schedule = today.on
+    ? `TODAY · ${gameDay.event} · ${gameDay.venue} · ` +
+      gameDay.games.map((g) => `${g.label} ${g.division}: CA TRIPLE THREAT VS ${g.opponent}`).join("  ·  ") + "  ·  "
+    : "";
+  const ticker = `${schedule}${liveScreen.ticker}  ·  `;
 
   return (
     <div
@@ -179,8 +196,14 @@ export default function LiveScreen() {
         <div aria-hidden className="pointer-events-none absolute inset-0 text-[clamp(.55rem,.85vw,.8rem)]">
           <span className="display absolute left-[3%] top-[5%] flex items-center gap-[.5em] rounded-[.2em] bg-brand-red px-[.7em] py-[.2em] tracking-widest text-white shadow-[0_0_14px_rgba(231,25,32,.7)]">
             <span className="h-[.6em] w-[.6em] animate-pulse rounded-full bg-white" />
-            {embed && liveScreen.streamIsLive ? liveScreen.badgeLive : liveScreen.badgeReplay}
+            {/* the embedded broadcast is live on game day; afterwards it is a recording */}
+            {embed && (liveScreen.streamIsLive || today.on) ? liveScreen.badgeLive : liveScreen.badgeReplay}
           </span>
+          {today.on && today.next && (
+            <span data-testid="up-next" className="display absolute left-[3%] top-[17%] rounded-[.2em] bg-black/70 px-[.7em] py-[.2em] tracking-widest text-white ring-1 ring-brand-green/60">
+              UP NEXT · {today.next.label} · {today.next.division} VS {today.next.opponent}
+            </span>
+          )}
           <span className="display absolute right-[3%] top-[5%] flex items-center gap-[.5em] rounded-[.2em] bg-black/65 px-[.7em] py-[.2em] tracking-[.18em] text-white ring-1 ring-white/25">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/brand/logo-clean.png" alt="" className="h-[1.5em] w-[1.5em] rounded-full" />
