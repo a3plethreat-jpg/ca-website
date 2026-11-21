@@ -149,7 +149,8 @@ export default function LiveScreen() {
     return () => window.clearInterval(t);
   }, []);
   const schedule = today.on
-    ? `TODAY · ${gameDay.event} · ${gameDay.venue} · ${gameDay.delayed ? "SCHEDULE RUNNING LATE · " : ""}` +
+    ? `${gameDay.games.filter((g) => g.playing).map((g) => `NOW PLAYING: ${g.division} CA TRIPLE THREAT VS ${g.opponent} · `).join("")}` +
+      `TODAY · ${gameDay.event} · ${gameDay.venue} · ${gameDay.delayed ? "SCHEDULE RUNNING LATE · " : ""}` +
       gameDay.games.map((g) => `${g.label} ${g.division}: CA TRIPLE THREAT VS ${g.opponent}`).join("  ·  ") + "  ·  "
     : "";
   const ticker = `${schedule}${liveScreen.ticker}  ·  `;
@@ -204,7 +205,9 @@ export default function LiveScreen() {
           </span>
           {today.on && today.next && (
             <span data-testid="up-next" className="display absolute left-[3%] top-[17%] rounded-[.2em] bg-black/70 px-[.7em] py-[.2em] tracking-widest text-white ring-1 ring-brand-green/60">
-              UP NEXT · {gameDay.delayed ? "DELAYED" : today.next.label} · {today.next.division} VS {today.next.opponent}
+              {today.next.playing
+                ? `NOW PLAYING · ${today.next.division} · CA TRIPLE THREAT VS ${today.next.opponent}`
+                : `UP NEXT · ${gameDay.delayed ? "DELAYED" : today.next.label} · ${today.next.division} VS ${today.next.opponent}`}
             </span>
           )}
           <span className="display absolute right-[3%] top-[5%] flex items-center gap-[.5em] rounded-[.2em] bg-black/65 px-[.7em] py-[.2em] tracking-[.18em] text-white ring-1 ring-white/25">

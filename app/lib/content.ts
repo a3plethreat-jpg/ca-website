@@ -163,10 +163,11 @@ export const gameDay = {
   venue: "BALIUAG STAR ARENA",
   // When games run late: set delayed, and mark each game done once it has finished.
   // While delayed, "UP NEXT" is the first game not done (instead of going by the clock).
+  // Set playing on the game in progress: the chip then reads "NOW PLAYING" and the ticker leads with it.
   delayed: true,
   games: [
-    { time: "10:30", label: "10:30 AM", division: "17U", opponent: "LAGUNDI", done: false },
-    { time: "11:45", label: "11:45 AM", division: "15U", opponent: "CMB SPORTS B", done: false },
+    { time: "10:30", label: "10:30 AM", division: "17U", opponent: "LAGUNDI", done: false, playing: true },
+    { time: "11:45", label: "11:45 AM", division: "15U", opponent: "CMB SPORTS B", done: false, playing: false },
   ],
 };
 
