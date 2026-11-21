@@ -139,12 +139,32 @@ export const DUDOY_CHAT_URL =
  * - Otherwise it plays the recorded game clips, styled as a broadcast, with the badge text below.
  */
 export const liveScreen = {
-  streamUrl: process.env.NEXT_PUBLIC_LIVE_STREAM_URL ?? "",
+  // A real live stream (YouTube/Facebook) set in NEXT_PUBLIC_LIVE_STREAM_URL takes over the screen with a LIVE badge.
+  // Otherwise the screen embeds this recorded Facebook video (NYBL Bulacan Season 5) with the LIVE REPLAY badge.
+  streamUrl: process.env.NEXT_PUBLIC_LIVE_STREAM_URL || "https://www.facebook.com/watch/?v=1684922109712721",
+  streamIsLive: Boolean(process.env.NEXT_PUBLIC_LIVE_STREAM_URL),
   channel: "TRIPLE THREAT TV",
   badgeLive: "LIVE",
   badgeReplay: "LIVE REPLAY",
-  clips: [{ src: "/clips/highlight-17u.mp4", poster: "/clips/highlight-17u.webp" }],
-  ticker: "17U CHAMPIONS · NYBL SEASON 4 INVITATIONAL CUP · KBA D-LEAGUE 2026 CHAMPIONS · PLAY HARD. STAY TRUE.",
+  // played in order, then repeats from the start
+  clips: [
+    { src: "/clips/highlight-17u.mp4", poster: "/clips/highlight-17u.webp" },
+  ],
+  ticker: "17U CHAMPIONS · NYBL SEASON 4 INVITATIONAL CUP · NYBL BULACAN SEASON 5 INVITATIONAL CUP · KBA D-LEAGUE 2026 CHAMPIONS · PLAY HARD. STAY TRUE.",
+};
+
+/**
+ * Game day shown on the corner screen (ticker + "UP NEXT"), only on `date` in Philippine time.
+ * Source: NYBL Bulacan Season 5 schedule poster (Central Luzon Championship).
+ */
+export const gameDay = {
+  date: "2026-11-21",
+  event: "NYBL BULACAN SEASON 5 · CENTRAL LUZON CHAMPIONSHIP",
+  venue: "BALIUAG STAR ARENA",
+  games: [
+    { time: "10:30", label: "10:30 AM", division: "17U", opponent: "LAGUNDI" },
+    { time: "11:45", label: "11:45 AM", division: "15U", opponent: "CMB SPORTS B" },
+  ],
 };
 
 export const trainingClips = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => ({
