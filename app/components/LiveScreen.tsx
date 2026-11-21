@@ -63,7 +63,11 @@ function Expanded({ onClose, children }: { onClose: () => void; children: React.
 
 export default function LiveScreen() {
   const embed = liveScreen.streamUrl ? safeEmbed(liveScreen.streamUrl) : null;
-  const clip = liveScreen.clips[0];
+  const [clipIdx, setClipIdx] = useState(0);
+  const clip = liveScreen.clips[clipIdx];
+  const many = liveScreen.clips.length > 1;
+  const switched = useRef(false); // true once a clip has ended and the next one is loading
+  const nextClip = () => { switched.current = true; setClipIdx((i) => (i + 1) % liveScreen.clips.length); };
   const videoRef = useRef<HTMLVideoElement>(null);
   const bigRef = useRef<HTMLVideoElement>(null);
   const [expanded, setExpanded] = useState(false);
@@ -151,7 +155,9 @@ export default function LiveScreen() {
             src={clip.src}
             poster={clip.poster}
             muted
-            loop
+            loop={!many}
+            onEnded={many ? nextClip : undefined}
+            onLoadedData={(e) => { if (switched.current && !reduced && !expanded) e.currentTarget.play().catch(() => {}); }}
             playsInline
             preload="auto"
             controls={reduced}

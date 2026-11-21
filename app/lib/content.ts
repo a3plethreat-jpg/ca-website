@@ -143,8 +143,12 @@ export const liveScreen = {
   channel: "TRIPLE THREAT TV",
   badgeLive: "LIVE",
   badgeReplay: "LIVE REPLAY",
-  clips: [{ src: "/clips/highlight-17u.mp4", poster: "/clips/highlight-17u.webp" }],
-  ticker: "17U CHAMPIONS · NYBL SEASON 4 INVITATIONAL CUP · KBA D-LEAGUE 2026 CHAMPIONS · PLAY HARD. STAY TRUE.",
+  // played in order, then repeats from the start
+  clips: [
+    { src: "/clips/highlight-17u.mp4", poster: "/clips/highlight-17u.webp" },
+    { src: "/clips/nybl-s5-bulacan.mp4", poster: "/clips/nybl-s5-bulacan.webp" }, // NYBL Bulacan Season 5 Invitational Cup
+  ],
+  ticker: "17U CHAMPIONS · NYBL SEASON 4 INVITATIONAL CUP · NYBL BULACAN SEASON 5 INVITATIONAL CUP · KBA D-LEAGUE 2026 CHAMPIONS · PLAY HARD. STAY TRUE.",
 };
 
 export const trainingClips = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => ({
