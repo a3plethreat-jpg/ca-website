@@ -161,9 +161,12 @@ export const gameDay = {
   date: "2026-11-21",
   event: "NYBL BULACAN SEASON 5 · CENTRAL LUZON CHAMPIONSHIP",
   venue: "BALIUAG STAR ARENA",
+  // When games run late: set delayed, and mark each game done once it has finished.
+  // While delayed, "UP NEXT" is the first game not done (instead of going by the clock).
+  delayed: true,
   games: [
-    { time: "10:30", label: "10:30 AM", division: "17U", opponent: "LAGUNDI" },
-    { time: "11:45", label: "11:45 AM", division: "15U", opponent: "CMB SPORTS B" },
+    { time: "10:30", label: "10:30 AM", division: "17U", opponent: "LAGUNDI", done: false },
+    { time: "11:45", label: "11:45 AM", division: "15U", opponent: "CMB SPORTS B", done: false },
   ],
 };
 
