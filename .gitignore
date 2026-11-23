@@ -6,3 +6,6 @@ next-env.d.ts
 /dist/
 .vinext/
 .cloudflare/
+
+# plugin session logs
+.harnesskit/

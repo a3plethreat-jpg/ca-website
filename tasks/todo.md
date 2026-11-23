@@ -10,6 +10,13 @@
 - [x] GitHub workflow deploys to the `ca-website` Worker (token cleaned + verified before deploy; token re-saved)
 - [ ] Move `coachatriplethreat.com` from the old Pages project to the `ca-website` Worker
 
+## Page debug (2026-11-23)
+- [x] Mobile hero: on short phones (<=760px tall) the hero copy overlapped the corner live screen by up to 143px. Fixed: smaller screen, no description, tighter copy. Verified at 360x640 to 768x1024, no overlap.
+- [x] Dudoy speech bubble could cover the "Explore our story" button: made click-through.
+- [x] Removed duplicate `allowFullScreen` on the live-screen iframes (console warning).
+- [ ] BLOCKER (owner): every Cloudflare deploy since PR #4 failed: the `CLOUDFLARE_API_TOKEN` repo secret is rejected ("token status: invalid"). v3.coachatriplethreat.com still serves an old build. Replace the secret, then re-run the "Deploy to Cloudflare" workflow.
+- Note: coachatriplethreat.com is served by Vercel (not Cloudflare Pages as assumed above).
+
 ## Next
 - [ ] Sponsors logo section (need logo files, names, links)
 - [ ] Shirt store (checkout method, prices, sizes, currency; art in Pagesite repo)

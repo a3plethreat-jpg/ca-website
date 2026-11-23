@@ -171,7 +171,6 @@ export default function LiveScreen() {
             src={embed}
             title="Live stream"
             allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-            allowFullScreen
             className="absolute inset-0 h-full w-full border-0 bg-black"
             data-testid="live-embed"
           />
@@ -245,7 +244,6 @@ export default function LiveScreen() {
               src={embed.replace(/([?&])mute=(1|true)/, "$1mute=0")}
               title="Live stream (expanded)"
               allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-              allowFullScreen
               className="h-full w-full border-0"
             />
           ) : (
