@@ -106,7 +106,7 @@ export default function Hero() {
 
         <div className="pointer-events-none absolute inset-x-0 bottom-[16%] z-30 md:bottom-[20%]" style={{ opacity: "var(--hero)" }}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 [&_a]:pointer-events-auto">
-            <div className="max-w-2xl bg-gradient-to-r from-bg/80 via-bg/50 to-transparent p-4 sm:p-6 md:bg-none md:p-0">
+            <div className="hero-copy max-w-2xl bg-gradient-to-r from-bg/80 via-bg/50 to-transparent p-4 sm:p-6 md:bg-none md:p-0">
               <p className="eyebrow rise">{hero.eyebrow}</p>
               <h1
                 id="hero-title"
@@ -126,7 +126,7 @@ export default function Hero() {
               <p className="display rise mt-4 text-[clamp(1.2rem,3vw,2rem)] leading-tight drop-shadow-[0_2px_10px_rgba(0,0,0,.8)]" style={{ animationDelay: "60ms" }}>
                 {hero.subhead}
               </p>
-              <p className="rise mt-3 max-w-xl text-white/85 drop-shadow-[0_2px_8px_rgba(0,0,0,.9)]" style={{ animationDelay: "120ms" }}>
+              <p className="hero-desc rise mt-3 max-w-xl text-white/85 drop-shadow-[0_2px_8px_rgba(0,0,0,.9)]" style={{ animationDelay: "120ms" }}>
                 {hero.description}
               </p>
               <div className="rise mt-6 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: "180ms" }}>

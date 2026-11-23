@@ -411,12 +411,12 @@ export default function Dudoy() {
       )}
 
       {phase === "whistle" && !open && (
-        <p aria-hidden className={`dudoy-say absolute bottom-[calc(100%+8px)] ${edge} w-max rounded-lg bg-white px-3 py-2 text-sm font-semibold text-black shadow-lg`}>
+        <p aria-hidden className={`dudoy-say pointer-events-none absolute bottom-[calc(100%+8px)] ${edge} w-max rounded-lg bg-white px-3 py-2 text-sm font-semibold text-black shadow-lg`}>
           FWEEET! 🎶
         </p>
       )}
       {say && !open && phase !== "whistle" && (
-        <p role="status" className={`dudoy-say absolute bottom-[calc(100%+8px)] ${edge} w-max max-w-[60vw] rounded-lg bg-white px-3 py-2 text-sm font-semibold text-black shadow-lg sm:max-w-[260px]`}>
+        <p role="status" className={`dudoy-say pointer-events-none absolute bottom-[calc(100%+8px)] ${edge} w-max max-w-[60vw] rounded-lg bg-white px-3 py-2 text-sm font-semibold text-black shadow-lg sm:max-w-[260px]`}>
           {say}
         </p>
       )}
