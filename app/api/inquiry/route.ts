@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { inquirySchema } from "../../lib/inquiry";
+import { mailProvider, sendMail } from "../../lib/mailer";
 
 export const runtime = "nodejs";
 
@@ -53,54 +54,39 @@ export async function POST(req: Request) {
     d.message,
   ].join("\n");
 
-  const key = process.env.RESEND_API_KEY;
   const defaultTo = process.env.INQUIRY_TO_EMAIL || "info@coachatriplethreat.com";
   const recipients = routeFor(d.inquiryType, defaultTo);
-  const to = recipients[0];
-  const from = process.env.INQUIRY_FROM_EMAIL;
-  if (!key || !from) {
+  if (!mailProvider()) {
     // No provider configured: log so nothing is silently lost during development.
-    console.warn("[inquiry] email not configured (RESEND_API_KEY / INQUIRY_FROM_EMAIL). Submission:\n" + text);
+    console.warn("[inquiry] email not configured (GMAIL_* or RESEND_API_KEY + INQUIRY_FROM_EMAIL). Submission:\n" + text);
     return NextResponse.json({ ok: true });
   }
 
   try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from,
-        to: recipients,
-        reply_to: d.email,
-        subject: `Camp inquiry — ${d.inquiryType} (${d.name})`,
-        text,
-      }),
+    await sendMail({
+      to: recipients,
+      replyTo: d.email,
+      subject: `Camp inquiry — ${d.inquiryType} (${d.name})`,
+      text,
     });
-    if (!res.ok) throw new Error(`provider ${res.status}`);
 
     // Auto-reply worker: acknowledge the sender. Best-effort — never fails the submission.
     try {
       const first = d.name.trim().split(/\s+/)[0];
-      const ack = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          from,
-          to: [d.email],
-          reply_to: to,
-          subject: "We got your message — CA Triple Threat Basketball Camp",
-          text: [
-            `Hi ${first},`,
-            "",
-            `Thanks for reaching out about "${d.inquiryType}". Our coaching team has received your inquiry and will reply as soon as possible.`,
-            "",
-            "You can reply to this email to add more details.",
-            "",
-            "— CA Triple Threat Basketball Camp",
-          ].join("\n"),
-        }),
+      await sendMail({
+        to: [d.email],
+        replyTo: recipients[0],
+        subject: "We got your message — CA Triple Threat Basketball Camp",
+        text: [
+          `Hi ${first},`,
+          "",
+          `Thanks for reaching out about "${d.inquiryType}". Our coaching team has received your inquiry and will reply as soon as possible.`,
+          "",
+          "You can reply to this email to add more details.",
+          "",
+          "— CA Triple Threat Basketball Camp",
+        ].join("\n"),
       });
-      if (!ack.ok) console.warn("[inquiry] auto-reply failed", ack.status);
     } catch (err) {
       console.warn("[inquiry] auto-reply error", err);
     }
