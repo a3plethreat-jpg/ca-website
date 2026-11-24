@@ -1,6 +1,7 @@
 /**
  * Outbound email for the inquiry form.
  * Provider order: Gmail API (GMAIL_* env) -> Resend (RESEND_API_KEY + INQUIRY_FROM_EMAIL) -> none.
+ * Merch orders go through Sendly instead when SENDLY_API_KEY + SENDLY_FROM are set (see sendMail's `channel`).
  * Uses plain fetch only, so it runs on Node and on Cloudflare Workers.
  */
 export type Mail = { to: string[]; replyTo?: string; subject: string; text: string };
@@ -23,7 +24,42 @@ function gmailConfig() {
   return id && secret && refresh && sender ? { id, secret, refresh, sender } : null;
 }
 
-export function mailProvider(): "gmail" | "resend" | null {
+function sendlyConfig() {
+  const { SENDLY_API_KEY: key, SENDLY_FROM: from, SENDLY_FROM_NAME: name } = process.env;
+  return key && from ? { key, from, name: name || "CA Triple Threat Basketball Camp" } : null;
+}
+
+const htmlEsc = (s: string) =>
+  s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+
+/** Plain text -> simple, safe HTML body (Sendly takes HTML). */
+const textToHtml = (t: string) =>
+  `<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:15px;line-height:1.6;color:#111">${htmlEsc(t).replace(/\n/g, "<br>")}</div>`;
+
+async function sendSendly(m: Mail) {
+  const c = sendlyConfig()!;
+  const [to, ...cc] = m.to.map(clean);
+  const res = await fetch("https://api.sendly.now/api/v1/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${c.key}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      to,
+      ...(cc.length ? { cc } : {}),
+      from: { email: clean(c.from), name: clean(c.name) },
+      ...(m.replyTo ? { reply: clean(m.replyTo) } : {}),
+      subject: clean(m.subject),
+      body: textToHtml(m.text),
+      priority: "high",
+      tags: ["merch"],
+    }),
+  });
+  if (!res.ok) throw new Error(`sendly ${res.status}`);
+}
+
+export type Channel = "default" | "merch";
+
+export function mailProvider(channel: Channel = "default"): "sendly" | "gmail" | "resend" | null {
+  if (channel === "merch" && sendlyConfig()) return "sendly";
   if (gmailConfig()) return "gmail";
   if (process.env.RESEND_API_KEY && process.env.INQUIRY_FROM_EMAIL) return "resend";
   return null;
@@ -78,8 +114,9 @@ async function sendResend(m: Mail) {
   if (!res.ok) throw new Error(`resend ${res.status}`);
 }
 
-export async function sendMail(m: Mail) {
-  const p = mailProvider();
+export async function sendMail(m: Mail, channel: Channel = "default") {
+  const p = mailProvider(channel);
+  if (p === "sendly") return sendSendly(m);
   if (p === "gmail") return sendGmail(m);
   if (p === "resend") return sendResend(m);
   throw new Error("no mail provider configured");

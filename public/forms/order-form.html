@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Order &amp; Inquiry Form | CA Triple Threat Basketball Camp</title>
+  <meta name="description" content="Order camp merch or send an inquiry to CA Triple Threat Basketball Camp.">
+  <!--
+    Standalone form: host this file anywhere or embed it.
+    It posts to the camp site's /api/inquiry endpoint, which sends the email through Resend
+    (RESEND_API_KEY + INQUIRY_FROM_EMAIL on the server). The Resend key never reaches the browser.
+    To point it at another deployment, change the form's action URL below.
+  -->
+  <style>
+    :root { --bg:#080a0c; --panel:#11151a; --line:#262c34; --text:#fff; --muted:#a9b1ba; --green:#008b22; --red:#e71920; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; padding:24px 16px; }
+    main { max-width:720px; margin:0 auto; }
+    .rule { height:4px; width:120px; background:linear-gradient(90deg,var(--green) 50%,var(--red) 50%); }
+    h1 { font:800 clamp(2rem,6vw,3rem)/1 "Arial Narrow",Impact,sans-serif; text-transform:uppercase; letter-spacing:.02em; margin:16px 0 8px; }
+    .lead { color:var(--muted); margin:0 0 24px; }
+    form { background:var(--panel); border:1px solid var(--line); padding:24px; display:grid; gap:18px; }
+    .grid { display:grid; gap:18px; grid-template-columns:1fr; }
+    @media (min-width:640px) { .grid { grid-template-columns:1fr 1fr; } .full { grid-column:1 / -1; } }
+    label, legend { display:block; font-size:.75rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+    input[type=text], input[type=email], input[type=tel], select, textarea {
+      width:100%; min-height:48px; padding:12px 14px; background:#000; color:var(--text);
+      border:1px solid var(--line); font:inherit; border-radius:0;
+    }
+    input:focus, select:focus, textarea:focus { outline:2px solid #fff; outline-offset:2px; border-color:var(--green); }
+    fieldset { border:0; margin:0; padding:0; }
+    .choices { display:grid; gap:8px; grid-template-columns:1fr; }
+    @media (min-width:640px) { .choices { grid-template-columns:repeat(3,1fr); } }
+    .choice { display:flex; align-items:center; gap:10px; min-height:48px; padding:0 14px; border:1px solid var(--line); background:#000; cursor:pointer; text-transform:none; letter-spacing:0; font-size:.95rem; color:var(--text); font-weight:400; margin:0; }
+    .choice input { accent-color:var(--green); width:18px; height:18px; }
+    .hint { color:var(--muted); font-size:.85rem; margin:6px 0 0; }
+    .check { display:flex; gap:10px; align-items:flex-start; text-transform:none; letter-spacing:0; font-size:.95rem; color:var(--text); font-weight:400; }
+    .check input { accent-color:var(--green); width:18px; height:18px; margin-top:3px; }
+    .note { border:1px solid rgba(0,139,34,.6); background:rgba(0,139,34,.1); padding:14px; font-size:.9rem; color:var(--muted); }
+    button { justify-self:start; min-height:48px; padding:0 28px; background:var(--red); color:#fff; border:0; font:800 1rem/1 "Arial Narrow",Impact,sans-serif; letter-spacing:.14em; text-transform:uppercase; cursor:pointer; }
+    button:hover { filter:brightness(1.1); }
+    .hp { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+    .steps { color:var(--muted); font-size:.9rem; margin:24px 0 0; padding-left:20px; }
+    .steps li { margin:4px 0; }
+    footer { color:var(--muted); font-size:.8rem; margin-top:20px; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="rule" aria-hidden="true"></div>
+  <h1>Order &amp; Inquiry</h1>
+  <p class="lead">Order camp merch or ask us anything. Every shirt is a dream come true — for every dreamer who laces up, shows up, and refuses to quit.</p>
+
+  <form action="https://preview.coachatriplethreat.com/api/inquiry" method="post" accept-charset="UTF-8">
+    <!-- spam trap: leave empty -->
+    <div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+
+    <div class="grid">
+      <div>
+        <label for="name">Full name *</label>
+        <input id="name" name="name" type="text" autocomplete="name" required minlength="2" maxlength="100">
+      </div>
+      <div>
+        <label for="email">Email address *</label>
+        <input id="email" name="email" type="email" autocomplete="email" required maxlength="200">
+      </div>
+      <div>
+        <label for="phone">Mobile number</label>
+        <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="09XX XXX XXXX" maxlength="30" pattern="[0-9+()\-.\s]*">
+        <p class="hint">Required for merch orders.</p>
+      </div>
+      <div>
+        <label for="inquiryType">Inquiry type *</label>
+        <select id="inquiryType" name="inquiryType" required>
+          <option value="Merch Order" selected>Merch Order</option>
+          <option>Basketball Camp</option>
+          <option>Training Schedule</option>
+          <option>Coaching Inquiry</option>
+          <option>Partnership</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="full">
+        <label for="address">Address</label>
+        <textarea id="address" name="address" rows="2" autocomplete="street-address" maxlength="300" placeholder="House no., street, barangay, city, province"></textarea>
+        <p class="hint">Required for merch orders.</p>
+      </div>
+      <fieldset class="full">
+        <legend>Pickup or delivery (merch orders)</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="fulfillment" value="Pick up at practice"> Pick up at practice</label>
+          <label class="choice"><input type="radio" name="fulfillment" value="J&amp;T Express delivery"> J&amp;T Express delivery</label>
+          <label class="choice"><input type="radio" name="fulfillment" value="Lalamove delivery"> Lalamove delivery</label>
+        </div>
+      </fieldset>
+      <div class="full">
+        <label for="ageGroup">Player age group (if relevant)</label>
+        <select id="ageGroup" name="ageGroup">
+          <option value="">Not specified</option>
+          <option>Under 10</option>
+          <option>10–12</option>
+          <option>13–15</option>
+          <option>16–18</option>
+          <option>Adult / not applicable</option>
+        </select>
+      </div>
+      <div class="full note">
+        <p style="margin:0 0 10px">Inquiring for a child? A parent or guardian should submit this form with their own contact details.</p>
+        <label class="check"><input type="checkbox" name="guardian"> I am the parent or guardian and this is my contact information (required if you chose an age group under 18).</label>
+      </div>
+      <div class="full">
+        <label for="message">Order details / message *</label>
+        <textarea id="message" name="message" rows="5" required minlength="10" maxlength="3000" placeholder="e.g. Built by Faith, washed pink, size L x 1 (₱700); Coach A 3D Shirt, black, size M x 2 (₱500 each)"></textarea>
+        <p class="hint">Washed-pink faith tees ₱700 · all other tees ₱500 · sizes S, M, L, XL, XXL, XXXL.</p>
+      </div>
+    </div>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <ol class="steps">
+    <li>Our team confirms your order and sends payment details.</li>
+    <li>After payment, you get an online receipt and your delivery day.</li>
+    <li>Pick it up at practice, or receive it via J&amp;T Express or Lalamove.</li>
+  </ol>
+  <footer>CA Triple Threat Basketball Camp · Pay only after we confirm your order.</footer>
+</main>
+<script>
+  // Optional helper: keep what was typed if the visitor comes back to fix an error. The form works without it.
+  (function () {
+    var form = document.querySelector("form"), key = "ca-order-form";
+    try {
+      var saved = JSON.parse(sessionStorage.getItem(key) || "null");
+      if (saved) {
+        Object.keys(saved).forEach(function (name) {
+          var els = form.elements[name];
+          if (!els || name === "website") return;
+          if (els.length && els[0] && els[0].type === "radio") {
+            for (var i = 0; i < els.length; i++) els[i].checked = els[i].value === saved[name];
+          } else if (els.type === "checkbox") els.checked = saved[name] === "on";
+          else els.value = saved[name];
+        });
+      }
+    } catch (e) {}
+    form.addEventListener("submit", function () {
+      try {
+        var data = {};
+        new FormData(form).forEach(function (v, k) { data[k] = v; });
+        sessionStorage.setItem(key, JSON.stringify(data));
+      } catch (e) {}
+    });
+  })();
+</script>
+</body>
+</html>

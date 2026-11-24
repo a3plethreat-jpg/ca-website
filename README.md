@@ -17,7 +17,8 @@ Copy `.env.example` to `.env.local` to configure contact details, the Dudoy chat
 |---|---|
 | `app/lib/content.ts` | **All site copy/data** (coaches, achievements, gallery, mindset, contact, live-screen config) |
 | `app/components/` | `Header`, `Stage` (fixed arena backdrop), `Hero` + `LiveScreen`, `About`, `Coaches`, `Mindset`, `Gallery`, `Contact` + `InquiryForm`, `Dudoy` (mascot chatbot), `Motion` (GSAP reveals) |
-| `app/api/inquiry/route.ts` | Contact form endpoint (validates, honeypot, sends via Resend if configured) |
+| `app/api/inquiry/route.ts` | Inquiry/order endpoint (validates, honeypot, routes by type, sends via Gmail or Resend). Accepts JSON (site forms) or a plain HTML form post, answering the latter with a small HTML page |
+| `public/forms/order-form.html` | Standalone HTML order & inquiry form (no JS needed) that posts to `/api/inquiry`; host or embed anywhere, change the `action` URL to point at another deployment |
 | `app/globals.css` | Tailwind theme tokens + custom styles |
 | `public/` | Images, clips, mascot poses, audio |
 
