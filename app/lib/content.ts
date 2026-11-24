@@ -16,6 +16,17 @@ export const nav = [
   { label: "Contact", href: "#contact" },
 ];
 
+// Online merch store (separate site). Shown in the header and the footer site map.
+export const merch = {
+  label: "Merch",
+  url: "https://coach-a-triple-threat-merch.alfred-virtualsoluti.chatgpt.site/",
+  pages: [
+    { label: "Shop home", href: "https://coach-a-triple-threat-merch.alfred-virtualsoluti.chatgpt.site/" },
+    { label: "The collection", href: "https://coach-a-triple-threat-merch.alfred-virtualsoluti.chatgpt.site/#collection" },
+    { label: "Camp lookbook", href: "https://coach-a-triple-threat-merch.alfred-virtualsoluti.chatgpt.site/#lookbook" },
+  ],
+};
+
 export const sectionIds = ["home", "about", "coaches", "mindset", "gallery", "contact"];
 
 export const hero = {
