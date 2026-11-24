@@ -132,4 +132,4 @@ User-Agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://preview.coachatriplethreat.com/sitemap.xml
+Sitemap: https://coachatriplethreat.com/sitemap.xml
