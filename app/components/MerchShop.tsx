@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { merch, type MerchProduct, type MerchView } from "../lib/content";
+import { merch, peso, type MerchProduct, type MerchView } from "../lib/content";
 import InquiryForm from "./InquiryForm";
 
 type Line = (typeof merch.lines)[number];
-type RequestItem = { key: string; product: string; color: string; size: string; qty: number };
+type RequestItem = { key: string; product: string; color: string; size: string; qty: number; price: number };
 
 function ProductCard({
   p,
@@ -45,7 +45,7 @@ function ProductCard({
 
   function add() {
     if (!size) return document.getElementById(`size-${p.id}`)?.focus();
-    onAdd({ product: p.name, color: color.name, size, qty });
+    onAdd({ product: p.name, color: color.name, size, qty, price: p.price });
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1800);
   }
@@ -78,7 +78,13 @@ function ProductCard({
 
       <div className="flex flex-1 flex-col gap-4 p-5">
         <div>
-          <h3 id={`t-${p.id}`} className="display text-2xl tracking-[.04em]">{p.name}</h3>
+          <div className="flex items-baseline justify-between gap-3">
+            <h3 id={`t-${p.id}`} className="display text-2xl tracking-[.04em]">{p.name}</h3>
+            <p className="display shrink-0 text-2xl text-white">
+              <span className="sr-only">Price: </span>
+              {peso(p.price)}
+            </p>
+          </div>
           <p className="mt-1 text-sm text-silver">{p.blurb}</p>
           {p.verse && <p className="mt-1 text-xs tracking-[.12em] text-green-text uppercase">{p.verse}</p>}
         </div>
@@ -175,7 +181,8 @@ export default function MerchShop() {
       items.length
         ? [
             "Merch order request:",
-            ...items.map((i) => `- ${i.product} — ${i.color} — Size ${i.size} × ${i.qty}`),
+            ...items.map((i) => `- ${i.product} — ${i.color} — Size ${i.size} × ${i.qty} — ${peso(i.price * i.qty)}`),
+            `Total: ${peso(items.reduce((n, i) => n + i.price * i.qty, 0))}`,
             "",
             "Pickup or delivery preference: ",
           ].join("\n")
@@ -199,6 +206,7 @@ export default function MerchShop() {
   }
 
   const count = items.reduce((n, i) => n + i.qty, 0);
+  const total = items.reduce((n, i) => n + i.price * i.qty, 0);
 
   return (
     <>
@@ -251,7 +259,7 @@ export default function MerchShop() {
           <p className="eyebrow text-green-text">Order</p>
           <h2 id="order-title" className="display mt-2 text-5xl sm:text-6xl">Your request</h2>
           <p className="mt-4 text-silver">
-            Add tees above, then send the request. The coaching team replies by email to confirm price, sizes and pickup at camp.
+            Add tees above, then send the request. The coaching team replies by email to confirm sizes, payment and pickup at camp.
           </p>
           {items.length ? (
             <ul className="mt-6 divide-y divide-line border-y border-line" aria-label="Items in your request">
@@ -259,13 +267,18 @@ export default function MerchShop() {
                 <li key={i.key} className="flex items-center justify-between gap-4 py-3">
                   <span>
                     <strong className="block">{i.product}</strong>
-                    <span className="text-sm text-silver">{i.color} · Size {i.size} · ×{i.qty}</span>
+                    <span className="text-sm text-silver">{i.color} · Size {i.size} · {i.qty} × {peso(i.price)}</span>
                   </span>
+                  <span className="ml-auto font-semibold">{peso(i.price * i.qty)}</span>
                   <button type="button" className="text-sm text-red-text underline-offset-4 hover:underline" onClick={() => setItems((l) => l.filter((x) => x.key !== i.key))} aria-label={`Remove ${i.product}, ${i.color}, size ${i.size}`}>
                     Remove
                   </button>
                 </li>
               ))}
+              <li className="flex items-center justify-between py-3">
+                <span className="display tracking-[.12em] text-silver">Total</span>
+                <span className="display text-2xl" aria-live="polite">{peso(total)}</span>
+              </li>
             </ul>
           ) : (
             <p className="mt-6 border border-dashed border-line p-4 text-sm text-silver">No tees added yet. You can also just describe what you want in the message.</p>
@@ -278,9 +291,9 @@ export default function MerchShop() {
         <a
           href="#order"
           className="btn btn-primary fixed bottom-5 left-1/2 z-40 -translate-x-1/2 shadow-lg shadow-black/50"
-          aria-label={`Review your request: ${count} item${count > 1 ? "s" : ""}`}
+          aria-label={`Review your request: ${count} item${count > 1 ? "s" : ""}, ${peso(total)}`}
         >
-          Your request · {count}
+          Your request · {count} · {peso(total)}
         </a>
       )}
 

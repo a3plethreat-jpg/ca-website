@@ -22,6 +22,7 @@
 - [x] Merch page `/merch` (2026-11-24): improved take on the standalone merch site, in the camp's own design. One card per design with color swatches and front/back views, line filter, enlarge dialog, size + qty, multi-item request list, "Merch Order" inquiry prefilled; verified desktop + mobile, no console errors, submit clears the request.
 - [x] Merch hero frame animated with Remotion (`@remotion/player`, lazy-loaded): 4-slide loop of the tees, pause/play button, pauses off-screen, still frame for reduced motion. Product cards reveal on scroll; "Added" pops.
 - [ ] Remotion license: free for individuals and companies of up to 3 people; larger orgs need a company license (owner to confirm, then set `acknowledgeRemotionLicense` to silence the console notice)
-- [ ] Merch: real prices, size range, checkout/payment and pickup details (page currently takes order requests only; sizes list is a placeholder)
+- [x] Merch prices (owner, 2026-11-24): washed-pink faith tees ₱700, all others ₱500. Shown on cards, in the reel, request list with totals, and the order message. Added the "Every shirt is a dream come true" quote band. New Coach A 3D red/black photos (black has Dark/Light views).
+- [ ] Merch: real size range, payment method and pickup details (page takes order requests only; sizes list is a placeholder)
 - [ ] Decide on porting the optional 3D arena scene
 - [ ] Configure email delivery (Resend) and real live-stream URL

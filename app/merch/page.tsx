@@ -2,13 +2,16 @@ import type { Metadata } from "next";
 import Footer from "../components/Footer";
 import MerchShop from "../components/MerchShop";
 import MerchHeroFrame from "../components/merch/MerchHeroFrame";
-import { site } from "../lib/content";
+import { merch, peso, site } from "../lib/content";
 
 export const metadata: Metadata = {
   title: "Merch | CA Triple Threat Basketball Camp",
   description: "Coach A 3D shirts, washed-pink faith tees and Play Hard Stay True camp apparel. Pick a color and size and send an order request.",
   alternates: { canonical: `${site.url}/merch` },
 };
+
+const basePrice = Math.min(...merch.products.map((p) => p.price));
+const faithPrice = Math.max(...merch.products.filter((p) => p.line === "Faith").map((p) => p.price));
 
 export default function MerchPage() {
   return (
@@ -49,7 +52,7 @@ export default function MerchPage() {
             </h1>
             <span aria-hidden className="rule mt-6 block w-40" />
             <p className="mt-6 max-w-xl text-lg text-silver">
-              Wear what the camp stands for. Pick a design, color and size, add it to your request, and the coaching team will confirm price and pickup.
+              Wear what the camp stands for. Camp tees {peso(basePrice)}, washed-pink faith tees {peso(faithPrice)}. Pick a design, color and size, add it to your request, and the coaching team will confirm payment and pickup.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <a href="#collection" className="btn btn-primary">Shop the collection</a>
@@ -60,6 +63,21 @@ export default function MerchPage() {
               <MerchHeroFrame />
             </div>
           </div>
+        </section>
+        <section aria-labelledby="dream-quote" className="relative overflow-hidden border-b border-line">
+          <div aria-hidden className="absolute inset-0 bg-[radial-gradient(60%_80%_at_20%_50%,rgba(0,139,34,.18),transparent),radial-gradient(60%_80%_at_80%_50%,rgba(231,25,32,.16),transparent)]" />
+          <figure className="relative mx-auto max-w-4xl px-4 py-20 text-center sm:px-6">
+            <span aria-hidden className="display block text-7xl leading-none text-green-text">“</span>
+            <blockquote id="dream-quote" className="display mt-2 text-4xl leading-tight sm:text-5xl">
+              {merch.quote.text}
+            </blockquote>
+            <figcaption className="mt-6 text-lg text-silver">{merch.quote.invite}</figcaption>
+            <span aria-hidden className="rule mx-auto mt-8 block w-40" />
+            <div className="mt-8 flex flex-wrap justify-center gap-4">
+              <a href="#collection" className="btn btn-primary">Find your shirt</a>
+              <a href="/#contact" className="btn btn-ghost">Join the camp</a>
+            </div>
+          </figure>
         </section>
         <MerchShop />
       </main>

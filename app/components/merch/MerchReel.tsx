@@ -1,11 +1,12 @@
 import { AbsoluteFill, Img, interpolate, Sequence, spring, useCurrentFrame, useVideoConfig, Easing } from "remotion";
-import { merch } from "../../lib/content";
+import { merch, peso } from "../../lib/content";
 
 /** Remotion composition for the /merch hero frame: each design gets a short animated "drop". */
 export const REEL = { fps: 30, width: 1080, height: 1080, perSlide: 84, overlap: 14 };
 
 const slides = merch.products.map((p) => ({
   name: p.name,
+  price: peso(p.price),
   line: p.line,
   verse: p.verse,
   img: p.colors[0].views[0].src,
@@ -49,11 +50,11 @@ function Slide({ s, index }: { s: (typeof slides)[number]; index: number }) {
   return (
     <AbsoluteFill style={{ opacity }}>
       {/* product image */}
-      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", paddingBottom: 170 }}>
+      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", paddingBottom: 250 }}>
         <div
           style={{
-            width: 760,
-            height: 760,
+            width: 700,
+            height: 700,
             overflow: "hidden",
             transform: `translateX(${imgX}px) rotate(${imgRot}deg)`,
             boxShadow: "0 40px 80px rgba(0,0,0,.6)",
@@ -115,6 +116,21 @@ function Slide({ s, index }: { s: (typeof slides)[number]; index: number }) {
             ))}
           </div>
           <div style={{ fontFamily: sans, fontSize: 24, color: "#a9b1ba", opacity: t3 }}>{s.colors}</div>
+          <div
+            style={{
+              marginLeft: "auto",
+              fontFamily: display,
+              fontWeight: 800,
+              fontSize: 60,
+              lineHeight: 1,
+              color: "#fff",
+              opacity: t3,
+              transform: `scale(${interpolate(t3, [0, 1], [0.6, 1])})`,
+              transformOrigin: "right center",
+            }}
+          >
+            {s.price}
+          </div>
         </div>
       </div>
     </AbsoluteFill>

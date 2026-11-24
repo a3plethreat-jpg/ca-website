@@ -16,21 +16,30 @@ export const nav = [
   { label: "Contact", href: "#contact" },
 ];
 
-// Camp merch (/merch). Pricing and checkout aren't set up yet, so ordering goes through
-// the inquiry form ("Merch Order") and the team confirms price, size and pickup by reply.
+// Camp merch (/merch). There's no online checkout: orders go through the inquiry form
+// ("Merch Order") and the team confirms sizes, payment and pickup by reply.
 export type MerchView = { src: string; label: string; alt: string };
 export type MerchColor = { name: string; swatch: string; views: MerchView[] };
 export type MerchProduct = {
   id: string;
   name: string;
   line: "Signature" | "Faith" | "Camp";
+  /** Price per shirt in Philippine pesos. */
+  price: number;
   blurb: string;
   verse?: string;
   colors: MerchColor[];
 };
 
+export const peso = (n: number) =>
+  new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", maximumFractionDigits: 0 }).format(n);
+
 export const merch = {
   label: "Merch",
+  quote: {
+    text: "Every shirt is a dream come true — for every dreamer who laces up, shows up, and refuses to quit.",
+    invite: "Wear the dream, then come chase the next one with us on the court.",
+  },
   path: "/merch",
   lines: ["Signature", "Faith", "Camp"] as const,
   sizes: ["Youth S", "Youth M", "Youth L", "S", "M", "L", "XL", "2XL", "3XL"],
@@ -39,23 +48,34 @@ export const merch = {
       id: "coach-a-3d",
       name: "Coach A 3D Shirt",
       line: "Signature",
+      price: 500,
       blurb: "The full-color Coach-A wordmark, set big across the chest.",
-      colors: (["Red", "White", "Black"] as const).map((c) => ({
-        name: c,
-        swatch: { Red: "#d71920", White: "#f1f1ee", Black: "#111214" }[c],
-        views: [
-          {
-            src: `/merch/logo-${c.toLowerCase()}.webp`,
-            label: "Front",
-            alt: `${c} tee with the multicolor Coach-A basketball wordmark across the chest`,
-          },
-        ],
-      })),
+      colors: [
+        {
+          name: "Red",
+          swatch: "#d71920",
+          views: [{ src: "/merch/logo-red.webp", label: "Front", alt: "Red tee with the multicolor Coach-A basketball wordmark across the chest" }],
+        },
+        {
+          name: "White",
+          swatch: "#f1f1ee",
+          views: [{ src: "/merch/logo-white.webp", label: "Front", alt: "White tee with the multicolor Coach-A basketball wordmark across the chest" }],
+        },
+        {
+          name: "Black",
+          swatch: "#111214",
+          views: [
+            { src: "/merch/logo-black.webp", label: "Dark", alt: "Black tee with the multicolor Coach-A basketball wordmark across the chest, on a dark backdrop" },
+            { src: "/merch/logo-black-light.webp", label: "Light", alt: "Black tee with the multicolor Coach-A basketball wordmark across the chest, on a light backdrop" },
+          ],
+        },
+      ],
     },
     {
       id: "built-by-faith",
       name: "Built by Faith",
       line: "Faith",
+      price: 700,
       blurb: "Coach A chest crest up front; Built by Faith, Trained with Purpose on the back.",
       verse: "Colossians 3:23",
       colors: [
@@ -76,6 +96,7 @@ export const merch = {
       id: "walk-by-faith",
       name: "Walk by Faith",
       line: "Faith",
+      price: 700,
       blurb: "Walk by Faith, Not by Sight across the back with a CA chest logo.",
       verse: "2 Corinthians 5:7",
       colors: [
@@ -101,6 +122,7 @@ export const merch = {
       id: "play-hard-stay-true",
       name: "Play Hard Stay True",
       line: "Camp",
+      price: 500,
       blurb: "Camp chest logo up front, the Play Hard Stay True motto across the back.",
       colors: (["Black", "White"] as const).map((c) => ({
         name: `Court ${c.toLowerCase()}`,
