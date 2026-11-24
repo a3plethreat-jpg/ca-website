@@ -16,14 +16,114 @@ export const nav = [
   { label: "Contact", href: "#contact" },
 ];
 
-// Online merch store (separate site). Shown in the header and the footer site map.
+// Camp merch (/merch). Pricing and checkout aren't set up yet, so ordering goes through
+// the inquiry form ("Merch Order") and the team confirms price, size and pickup by reply.
+export type MerchView = { src: string; label: string; alt: string };
+export type MerchColor = { name: string; swatch: string; views: MerchView[] };
+export type MerchProduct = {
+  id: string;
+  name: string;
+  line: "Signature" | "Faith" | "Camp";
+  blurb: string;
+  verse?: string;
+  colors: MerchColor[];
+};
+
 export const merch = {
   label: "Merch",
-  url: "https://coach-a-triple-threat-merch.alfred-virtualsoluti.chatgpt.site/",
-  pages: [
-    { label: "Shop home", href: "https://coach-a-triple-threat-merch.alfred-virtualsoluti.chatgpt.site/" },
-    { label: "The collection", href: "https://coach-a-triple-threat-merch.alfred-virtualsoluti.chatgpt.site/#collection" },
-    { label: "Camp lookbook", href: "https://coach-a-triple-threat-merch.alfred-virtualsoluti.chatgpt.site/#lookbook" },
+  path: "/merch",
+  lines: ["Signature", "Faith", "Camp"] as const,
+  sizes: ["Youth S", "Youth M", "Youth L", "S", "M", "L", "XL", "2XL", "3XL"],
+  products: [
+    {
+      id: "coach-a-3d",
+      name: "Coach A 3D Shirt",
+      line: "Signature",
+      blurb: "The full-color Coach-A wordmark, set big across the chest.",
+      colors: (["Red", "White", "Black"] as const).map((c) => ({
+        name: c,
+        swatch: { Red: "#d71920", White: "#f1f1ee", Black: "#111214" }[c],
+        views: [
+          {
+            src: `/merch/logo-${c.toLowerCase()}.webp`,
+            label: "Front",
+            alt: `${c} tee with the multicolor Coach-A basketball wordmark across the chest`,
+          },
+        ],
+      })),
+    },
+    {
+      id: "built-by-faith",
+      name: "Built by Faith",
+      line: "Faith",
+      blurb: "Coach A chest crest up front; Built by Faith, Trained with Purpose on the back.",
+      verse: "Colossians 3:23",
+      colors: [
+        {
+          name: "Washed pink",
+          swatch: "#d9657d",
+          views: [
+            {
+              src: "/merch/built-by-faith.webp",
+              label: "Front + back",
+              alt: "Washed-pink tee: Coach A chest crest on the front, Built by Faith back graphic citing Colossians 3:23",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "walk-by-faith",
+      name: "Walk by Faith",
+      line: "Faith",
+      blurb: "Walk by Faith, Not by Sight across the back with a CA chest logo.",
+      verse: "2 Corinthians 5:7",
+      colors: [
+        {
+          name: "Washed pink",
+          swatch: "#d9657d",
+          views: [
+            {
+              src: "/merch/walk-back.webp",
+              label: "Back",
+              alt: "Washed-pink tee with the Walk by Faith, Not by Sight back graphic citing 2 Corinthians 5:7",
+            },
+            {
+              src: "/merch/walk-front.webp",
+              label: "Front",
+              alt: "Washed-pink tee with a red-and-green CA Coach A chest logo",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "play-hard-stay-true",
+      name: "Play Hard Stay True",
+      line: "Camp",
+      blurb: "Camp chest logo up front, the Play Hard Stay True motto across the back.",
+      colors: (["Black", "White"] as const).map((c) => ({
+        name: `Court ${c.toLowerCase()}`,
+        swatch: c === "Black" ? "#111214" : "#f1f1ee",
+        views: [
+          {
+            src: `/merch/${c.toLowerCase()}.webp`,
+            label: "Front + back",
+            alt: `${c} tee with the camp chest logo and the Play Hard Stay True back print`,
+          },
+          {
+            src: `/merch/${c.toLowerCase()}-back.webp`,
+            label: "Back print",
+            alt: `Close-up of the Play Hard Stay True back print on a ${c.toLowerCase()} tee`,
+          },
+        ],
+      })),
+    },
+  ] as MerchProduct[],
+  lookbook: [
+    { src: "/merch/logo-lineup.webp", alt: "Coach-A wordmark on black, red and white tees", caption: "Coach A 3D — three colorways", wide: true },
+    { src: "/merch/campaign.webp", alt: "Play Hard Stay True campaign poster", caption: "Play Hard Stay True campaign" },
+    { src: "/merch/lineup.webp", alt: "Coach-A merch design board", caption: "The design board" },
   ],
 };
 
@@ -247,7 +347,7 @@ export const gallery = [
 export const contact = {
   heading: "YOUR JOURNEY STARTS HERE.",
   text: "Ready to take the next step? Connect with our coaching team.",
-  inquiryTypes: ["Basketball Camp", "Training Schedule", "Coaching Inquiry", "Partnership", "Other"] as const,
+  inquiryTypes: ["Basketball Camp", "Training Schedule", "Coaching Inquiry", "Merch Order", "Partnership", "Other"] as const,
   ageGroups: ["Under 10", "10–12", "13–15", "16–18", "Adult / not applicable"] as const,
   guardianNote:
     "Inquiring for a child? Please have a parent or guardian submit this form and provide their own contact details. We don't ask for any unnecessary information about minors.",

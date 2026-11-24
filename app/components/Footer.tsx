@@ -10,7 +10,7 @@ export default function Footer() {
           <ul className="mt-3 space-y-2">
             {nav.map((n) => (
               <li key={n.href}>
-                <a href={n.href} className="text-sm text-white/85 transition-colors hover:text-white">
+                <a href={`/${n.href}`} className="text-sm text-white/85 transition-colors hover:text-white">
                   {n.label}
                 </a>
               </li>
@@ -18,17 +18,16 @@ export default function Footer() {
           </ul>
         </div>
         <div>
-          <h2 className="display text-sm tracking-[.2em] text-silver">Merch store</h2>
+          <h2 className="display text-sm tracking-[.2em] text-silver">Merch</h2>
           <ul className="mt-3 space-y-2">
-            {merch.pages.map((p) => (
+            {[
+              { label: "The collection", href: `${merch.path}#collection` },
+              { label: "Lookbook", href: `${merch.path}#lookbook` },
+              { label: "Order merch", href: `${merch.path}#order` },
+            ].map((p) => (
               <li key={p.href}>
-                <a
-                  href={p.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-white/85 transition-colors hover:text-white"
-                >
-                  {p.label} ↗<span className="sr-only"> (opens in a new tab)</span>
+                <a href={p.href} className="text-sm text-white/85 transition-colors hover:text-white">
+                  {p.label}
                 </a>
               </li>
             ))}

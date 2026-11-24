@@ -9,7 +9,17 @@ const field =
 
 type Status = "idle" | "sending" | "success" | "error";
 
-export default function InquiryForm() {
+type Props = {
+  /** Preselects the inquiry type (e.g. "Merch Order"). */
+  defaultType?: (typeof contact.inquiryTypes)[number];
+  /** Prefills the message box. Change `key` on the form to apply a new value. */
+  defaultMessage?: string;
+  label?: string;
+  /** Called after the inquiry was accepted by the server. */
+  onSuccess?: () => void;
+};
+
+export default function InquiryForm({ defaultType, defaultMessage, label = "Camp inquiry form", onSuccess }: Props = {}) {
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [banner, setBanner] = useState("");
@@ -51,7 +61,10 @@ export default function InquiryForm() {
         body: JSON.stringify(parsed.data),
       });
       const data = await res.json().catch(() => ({}));
-      if (res.ok && data.ok) return void setStatus("success");
+      if (res.ok && data.ok) {
+        onSuccess?.();
+        return void setStatus("success");
+      }
       if (data.fields) setErrors(data.fields);
       setBanner(data.message ?? "Something went wrong. Please try again.");
       setStatus("error");
@@ -80,7 +93,7 @@ export default function InquiryForm() {
   const aria = (k: string) => ({ "aria-invalid": !!errors[k], "aria-describedby": errors[k] ? `e-${k}` : undefined });
 
   return (
-    <form onSubmit={onSubmit} noValidate className="panel space-y-5 p-6 sm:p-8" aria-label="Camp inquiry form">
+    <form onSubmit={onSubmit} noValidate className="panel space-y-5 p-6 sm:p-8" aria-label={label}>
       <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
         <label>
           Website
@@ -105,7 +118,7 @@ export default function InquiryForm() {
         </div>
         <div>
           <label htmlFor="f-inquiryType" className="eyebrow">Inquiry type *</label>
-          <select id="f-inquiryType" name="inquiryType" required defaultValue="" className={`${field} mt-2`} {...aria("inquiryType")}>
+          <select id="f-inquiryType" name="inquiryType" required defaultValue={defaultType ?? ""} className={`${field} mt-2`} {...aria("inquiryType")}>
             <option value="" disabled>Select…</option>
             {contact.inquiryTypes.map((t) => <option key={t}>{t}</option>)}
           </select>
@@ -133,7 +146,7 @@ export default function InquiryForm() {
 
       <div>
         <label htmlFor="f-message" className="eyebrow">Message *</label>
-        <textarea id="f-message" name="message" rows={5} required className={`${field} mt-2`} {...aria("message")} />
+        <textarea id="f-message" name="message" rows={5} required defaultValue={defaultMessage} className={`${field} mt-2`} {...aria("message")} />
         {err("message")}
       </div>
 

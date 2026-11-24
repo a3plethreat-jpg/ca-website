@@ -62,13 +62,10 @@ export default function Header() {
             })}
             <li>
               <a
-                href={merch.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="display text-[1.05rem] tracking-[.12em] text-brand-red transition-colors hover:text-white"
+                href={merch.path}
+                className="display text-[1.05rem] tracking-[.12em] text-red-text transition-colors hover:text-white"
               >
                 {merch.label}
-                <span className="sr-only"> (opens the merch store in a new tab)</span>
                 <span className="mt-1 block h-[2px] scale-x-0" />
               </a>
             </li>
@@ -109,13 +106,11 @@ export default function Header() {
           ))}
           <li>
             <a
-              href={merch.url}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={merch.path}
               onClick={() => setOpen(false)}
-              className="display block py-4 text-2xl tracking-[.08em] text-brand-red"
+              className="display block py-4 text-2xl tracking-[.08em] text-red-text"
             >
-              {merch.label} ↗<span className="sr-only"> (opens the merch store in a new tab)</span>
+              {merch.label}
             </a>
           </li>
         </ul>
