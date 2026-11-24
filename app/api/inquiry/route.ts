@@ -126,9 +126,11 @@ export async function POST(req: Request) {
 
   const defaultTo = process.env.INQUIRY_TO_EMAIL || "info@coachatriplethreat.com";
   const recipients = routeFor(d.inquiryType, defaultTo);
-  if (!mailProvider()) {
+  // Merch orders go out through Sendly when it's configured; everything else via Gmail/Resend.
+  const channel = isOrder ? "merch" : "default";
+  if (!mailProvider(channel)) {
     // No provider configured: log so nothing is silently lost during development.
-    console.warn("[inquiry] email not configured (GMAIL_* or RESEND_API_KEY + INQUIRY_FROM_EMAIL). Submission:\n" + text);
+    console.warn("[inquiry] email not configured (SENDLY_* for merch, GMAIL_* or RESEND_API_KEY + INQUIRY_FROM_EMAIL). Submission:\n" + text);
     return reply(200, {
       ok: true,
       message: isOrder
@@ -143,7 +145,7 @@ export async function POST(req: Request) {
       replyTo: d.email,
       subject: isOrder ? `Merch order — ${d.name} (${d.fulfillment})` : `Camp inquiry — ${d.inquiryType} (${d.name})`,
       text,
-    });
+    }, channel);
 
     // Auto-reply worker: acknowledge the sender. Best-effort — never fails the submission.
     try {
@@ -183,7 +185,7 @@ export async function POST(req: Request) {
               "— CA Triple Threat Basketball Camp",
             ]
         ).join("\n"),
-      });
+      }, channel);
     } catch (err) {
       console.warn("[inquiry] auto-reply error", err);
     }
