@@ -3,6 +3,26 @@ import { inquirySchema } from "../../lib/inquiry";
 
 export const runtime = "nodejs";
 
+/**
+ * Staff routing by inquiry type. INQUIRY_ROUTES is a JSON object mapping an inquiry type
+ * to one or more comma-separated emails, e.g.
+ * {"Basketball Camp":"coach@x.com","Partnership":"a@x.com,b@x.com"}.
+ * Unmapped types (or invalid config) fall back to INQUIRY_TO_EMAIL.
+ */
+function routeFor(type: string, fallback: string): string[] {
+  try {
+    const routes = JSON.parse(process.env.INQUIRY_ROUTES || "{}") as Record<string, unknown>;
+    const raw = routes[type];
+    if (typeof raw === "string") {
+      const list = raw.split(",").map((e) => e.trim()).filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+      if (list.length) return list;
+    }
+  } catch {
+    console.warn("[inquiry] INQUIRY_ROUTES is not valid JSON; using default recipient");
+  }
+  return [fallback];
+}
+
 export async function POST(req: Request) {
   let body: unknown;
   try {
@@ -34,7 +54,9 @@ export async function POST(req: Request) {
   ].join("\n");
 
   const key = process.env.RESEND_API_KEY;
-  const to = process.env.INQUIRY_TO_EMAIL || "info@coachatriplethreat.com";
+  const defaultTo = process.env.INQUIRY_TO_EMAIL || "info@coachatriplethreat.com";
+  const recipients = routeFor(d.inquiryType, defaultTo);
+  const to = recipients[0];
   const from = process.env.INQUIRY_FROM_EMAIL;
   if (!key || !from) {
     // No provider configured: log so nothing is silently lost during development.
@@ -48,7 +70,7 @@ export async function POST(req: Request) {
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         from,
-        to: [to],
+        to: recipients,
         reply_to: d.email,
         subject: `Camp inquiry — ${d.inquiryType} (${d.name})`,
         text,
