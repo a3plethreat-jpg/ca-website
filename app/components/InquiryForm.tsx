@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { contact, NO_AGE } from "../lib/content";
+import { contact, merch, NO_AGE } from "../lib/content";
 import { inquirySchema } from "../lib/inquiry";
 
 const field =
@@ -9,12 +9,25 @@ const field =
 
 type Status = "idle" | "sending" | "success" | "error";
 
-export default function InquiryForm() {
+type Props = {
+  /** Preselects the inquiry type (e.g. "Merch Order"). */
+  defaultType?: (typeof contact.inquiryTypes)[number];
+  /** Prefills the message box. Change `key` on the form to apply a new value. */
+  defaultMessage?: string;
+  label?: string;
+  /** Called after the inquiry was accepted by the server. */
+  onSuccess?: () => void;
+  /** "merch" turns the form into an order form: phone, address and pickup/delivery are required. */
+  variant?: "inquiry" | "merch";
+};
+
+export default function InquiryForm({ defaultType, defaultMessage, label = "Camp inquiry form", onSuccess, variant = "inquiry" }: Props = {}) {
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [banner, setBanner] = useState("");
   const [age, setAge] = useState("");
   const busy = useRef(false);
+  const isMerch = variant === "merch";
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -27,6 +40,8 @@ export default function InquiryForm() {
       inquiryType: String(fd.get("inquiryType") ?? ""),
       ageGroup: String(fd.get("ageGroup") ?? ""),
       guardian: fd.get("guardian") === "on",
+      address: String(fd.get("address") ?? ""),
+      fulfillment: String(fd.get("fulfillment") ?? ""),
       message: String(fd.get("message") ?? ""),
       website: String(fd.get("website") ?? ""),
     };
@@ -51,7 +66,10 @@ export default function InquiryForm() {
         body: JSON.stringify(parsed.data),
       });
       const data = await res.json().catch(() => ({}));
-      if (res.ok && data.ok) return void setStatus("success");
+      if (res.ok && data.ok) {
+        onSuccess?.();
+        return void setStatus("success");
+      }
       if (data.fields) setErrors(data.fields);
       setBanner(data.message ?? "Something went wrong. Please try again.");
       setStatus("error");
@@ -67,9 +85,13 @@ export default function InquiryForm() {
     return (
       <div role="status" className="panel fx-panel p-8" data-testid="form-success">
         <span aria-hidden className="rule fx-draw block w-16" />
-        <h3 className="display mt-4 text-4xl">Message sent.</h3>
-        <p className="mt-3 text-silver">Thank you — the coaching team has your inquiry and will reply by email.</p>
-        <button type="button" className="btn btn-ghost mt-6" onClick={() => setStatus("idle")}>Send another</button>
+        <h3 className="display mt-4 text-4xl">{isMerch ? "Order request sent." : "Message sent."}</h3>
+        <p className="mt-3 text-silver">
+          {isMerch
+            ? "Salamat! Our team will confirm your order and send payment details. After payment you'll get an online receipt and your delivery day."
+            : "Thank you — the coaching team has your inquiry and will reply by email."}
+        </p>
+        <button type="button" className="btn btn-ghost mt-6" onClick={() => setStatus("idle")}>{isMerch ? "Place another order" : "Send another"}</button>
       </div>
     );
 
@@ -80,7 +102,14 @@ export default function InquiryForm() {
   const aria = (k: string) => ({ "aria-invalid": !!errors[k], "aria-describedby": errors[k] ? `e-${k}` : undefined });
 
   return (
-    <form onSubmit={onSubmit} noValidate className="panel space-y-5 p-6 sm:p-8" aria-label="Camp inquiry form">
+    <form
+      onSubmit={onSubmit}
+      onChange={(e) => {
+        // Clear a field's error as soon as the visitor changes it.
+        const name = (e.target as unknown as { name?: string }).name;
+        if (name && errors[name]) setErrors(({ [name]: _gone, ...rest }) => rest);
+      }}
+      noValidate className="panel space-y-5 p-6 sm:p-8" aria-label={label}>
       <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
         <label>
           Website
@@ -99,25 +128,51 @@ export default function InquiryForm() {
           {err("email")}
         </div>
         <div>
-          <label htmlFor="f-phone" className="eyebrow">Mobile number (optional)</label>
-          <input id="f-phone" name="phone" type="tel" autoComplete="tel" inputMode="tel" className={`${field} mt-2`} {...aria("phone")} />
+          <label htmlFor="f-phone" className="eyebrow">{isMerch ? "Mobile number *" : "Mobile number (optional)"}</label>
+          <input id="f-phone" name="phone" type="tel" autoComplete="tel" inputMode="tel" required={isMerch} placeholder={isMerch ? "09XX XXX XXXX" : undefined} className={`${field} mt-2`} {...aria("phone")} />
           {err("phone")}
         </div>
-        <div>
-          <label htmlFor="f-inquiryType" className="eyebrow">Inquiry type *</label>
-          <select id="f-inquiryType" name="inquiryType" required defaultValue="" className={`${field} mt-2`} {...aria("inquiryType")}>
-            <option value="" disabled>Select…</option>
-            {contact.inquiryTypes.map((t) => <option key={t}>{t}</option>)}
-          </select>
-          {err("inquiryType")}
-        </div>
-        <div className="sm:col-span-2">
-          <label htmlFor="f-ageGroup" className="eyebrow">Player age group (if relevant)</label>
-          <select id="f-ageGroup" name="ageGroup" value={age} onChange={(e) => setAge(e.target.value)} className={`${field} mt-2`}>
-            <option value="">Not specified</option>
-            {contact.ageGroups.map((t) => <option key={t}>{t}</option>)}
-          </select>
-        </div>
+        {isMerch ? (
+          <input type="hidden" name="inquiryType" value="Merch Order" />
+        ) : (
+          <div>
+            <label htmlFor="f-inquiryType" className="eyebrow">Inquiry type *</label>
+            <select id="f-inquiryType" name="inquiryType" required defaultValue={defaultType ?? ""} className={`${field} mt-2`} {...aria("inquiryType")}>
+              <option value="" disabled>Select…</option>
+              {contact.inquiryTypes.map((t) => <option key={t}>{t}</option>)}
+            </select>
+            {err("inquiryType")}
+          </div>
+        )}
+        {isMerch ? (
+          <>
+            <div className="sm:col-span-2">
+              <label htmlFor="f-address" className="eyebrow">Address *</label>
+              <textarea id="f-address" name="address" rows={2} required autoComplete="street-address" placeholder="House no., street, barangay, city, province" className={`${field} mt-2`} {...aria("address")} />
+              {err("address")}
+            </div>
+            <fieldset className="sm:col-span-2" aria-describedby={errors.fulfillment ? "e-fulfillment" : undefined}>
+              <legend className="eyebrow">Pickup or delivery *</legend>
+              <div className="mt-2 grid gap-2 sm:grid-cols-3">
+                {merch.fulfillment.map((f, i) => (
+                  <label key={f} className="flex min-h-12 cursor-pointer items-center gap-3 border border-line bg-black/35 px-4 has-[:checked]:border-brand-green has-[:checked]:bg-brand-green/10">
+                    <input id={i === 0 ? "f-fulfillment" : undefined} type="radio" name="fulfillment" value={f} required className="h-4 w-4 accent-[#008B22]" />
+                    <span className="text-sm">{f}</span>
+                  </label>
+                ))}
+              </div>
+              {err("fulfillment")}
+            </fieldset>
+          </>
+        ) : (
+          <div className="sm:col-span-2">
+            <label htmlFor="f-ageGroup" className="eyebrow">Player age group (if relevant)</label>
+            <select id="f-ageGroup" name="ageGroup" value={age} onChange={(e) => setAge(e.target.value)} className={`${field} mt-2`}>
+              <option value="">Not specified</option>
+              {contact.ageGroups.map((t) => <option key={t}>{t}</option>)}
+            </select>
+          </div>
+        )}
       </div>
 
       {!!age && age !== NO_AGE && (
@@ -132,8 +187,8 @@ export default function InquiryForm() {
       )}
 
       <div>
-        <label htmlFor="f-message" className="eyebrow">Message *</label>
-        <textarea id="f-message" name="message" rows={5} required className={`${field} mt-2`} {...aria("message")} />
+        <label htmlFor="f-message" className="eyebrow">{isMerch ? "Order details *" : "Message *"}</label>
+        <textarea id="f-message" name="message" rows={5} required defaultValue={defaultMessage} className={`${field} mt-2`} {...aria("message")} />
         {err("message")}
       </div>
 
@@ -144,7 +199,7 @@ export default function InquiryForm() {
       </div>
 
       <button type="submit" disabled={status === "sending"} className="btn btn-primary w-full disabled:cursor-wait disabled:opacity-60 sm:w-auto">
-        {status === "sending" ? "Sending…" : "Send inquiry"}
+        {status === "sending" ? "Sending…" : isMerch ? "Submit order" : "Send inquiry"}
       </button>
       {status === "sending" && <div aria-hidden className="fx-pulse h-[3px] w-full bg-gradient-to-r from-brand-green to-brand-red" />}
     </form>

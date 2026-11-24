@@ -16,6 +16,147 @@ export const nav = [
   { label: "Contact", href: "#contact" },
 ];
 
+// Camp merch (/merch). No online checkout: the visitor sends an order request ("Merch Order"),
+// the team confirms it and asks for payment, then sends an online receipt and the delivery day.
+export type MerchView = { src: string; label: string; alt: string };
+export type MerchColor = { name: string; swatch: string; views: MerchView[] };
+export type MerchProduct = {
+  id: string;
+  name: string;
+  line: "Signature" | "Faith" | "Camp";
+  /** Price per shirt in Philippine pesos. */
+  price: number;
+  blurb: string;
+  verse?: string;
+  colors: MerchColor[];
+};
+
+export const peso = (n: number) =>
+  new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", maximumFractionDigits: 0 }).format(n);
+
+export const merch = {
+  label: "Merch",
+  quote: {
+    text: "Every shirt is a dream come true — for every dreamer who laces up, shows up, and refuses to quit.",
+    invite: "Wear the dream, then come chase the next one with us on the court.",
+  },
+  path: "/merch",
+  lines: ["Signature", "Faith", "Camp"] as const,
+  sizes: ["S", "M", "L", "XL", "XXL", "XXXL"],
+  fulfillment: ["Pick up at practice", "J&T Express delivery", "Lalamove delivery"] as const,
+  steps: [
+    { title: "Pick your shirt", text: "Choose a design, color and size, and add it to your order." },
+    { title: "Send your details", text: "Fill in your name, phone, address and email, then submit the order." },
+    { title: "We confirm", text: "Our team checks stock, confirms your order and sends payment details." },
+    { title: "Pay, get your receipt", text: "Once payment is received, you get an online receipt and your delivery day." },
+    { title: "Receive it", text: "Pick it up at practice, or get it delivered via J&T Express or Lalamove." },
+  ],
+  products: [
+    {
+      id: "coach-a-3d",
+      name: "Coach A 3D Shirt",
+      line: "Signature",
+      price: 500,
+      blurb: "The full-color Coach-A wordmark, set big across the chest.",
+      colors: [
+        {
+          name: "Red",
+          swatch: "#d71920",
+          views: [{ src: "/merch/logo-red.webp", label: "Front", alt: "Red tee with the multicolor Coach-A basketball wordmark across the chest" }],
+        },
+        {
+          name: "White",
+          swatch: "#f1f1ee",
+          views: [{ src: "/merch/logo-white.webp", label: "Front", alt: "White tee with the multicolor Coach-A basketball wordmark across the chest" }],
+        },
+        {
+          name: "Black",
+          swatch: "#111214",
+          views: [
+            { src: "/merch/logo-black.webp", label: "Dark", alt: "Black tee with the multicolor Coach-A basketball wordmark across the chest, on a dark backdrop" },
+            { src: "/merch/logo-black-light.webp", label: "Light", alt: "Black tee with the multicolor Coach-A basketball wordmark across the chest, on a light backdrop" },
+          ],
+        },
+      ],
+    },
+    {
+      id: "built-by-faith",
+      name: "Built by Faith",
+      line: "Faith",
+      price: 700,
+      blurb: "Coach A chest crest up front; Built by Faith, Trained with Purpose on the back.",
+      verse: "Colossians 3:23",
+      colors: [
+        {
+          name: "Washed pink",
+          swatch: "#d9657d",
+          views: [
+            {
+              src: "/merch/built-by-faith.webp",
+              label: "Front + back",
+              alt: "Washed-pink tee: Coach A chest crest on the front, Built by Faith back graphic citing Colossians 3:23",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "walk-by-faith",
+      name: "Walk by Faith",
+      line: "Faith",
+      price: 700,
+      blurb: "Walk by Faith, Not by Sight across the back with a CA chest logo.",
+      verse: "2 Corinthians 5:7",
+      colors: [
+        {
+          name: "Washed pink",
+          swatch: "#d9657d",
+          views: [
+            {
+              src: "/merch/walk-back.webp",
+              label: "Back",
+              alt: "Washed-pink tee with the Walk by Faith, Not by Sight back graphic citing 2 Corinthians 5:7",
+            },
+            {
+              src: "/merch/walk-front.webp",
+              label: "Front",
+              alt: "Washed-pink tee with a red-and-green CA Coach A chest logo",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "play-hard-stay-true",
+      name: "Play Hard Stay True",
+      line: "Camp",
+      price: 500,
+      blurb: "Camp chest logo up front, the Play Hard Stay True motto across the back.",
+      colors: (["Black", "White"] as const).map((c) => ({
+        name: `Court ${c.toLowerCase()}`,
+        swatch: c === "Black" ? "#111214" : "#f1f1ee",
+        views: [
+          {
+            src: `/merch/${c.toLowerCase()}.webp`,
+            label: "Front + back",
+            alt: `${c} tee with the camp chest logo and the Play Hard Stay True back print`,
+          },
+          {
+            src: `/merch/${c.toLowerCase()}-back.webp`,
+            label: "Back print",
+            alt: `Close-up of the Play Hard Stay True back print on a ${c.toLowerCase()} tee`,
+          },
+        ],
+      })),
+    },
+  ] as MerchProduct[],
+  lookbook: [
+    { src: "/merch/logo-lineup.webp", alt: "Coach-A wordmark on black, red and white tees", caption: "Coach A 3D — three colorways", wide: true },
+    { src: "/merch/campaign.webp", alt: "Play Hard Stay True campaign poster", caption: "Play Hard Stay True campaign" },
+    { src: "/merch/lineup.webp", alt: "Coach-A merch design board", caption: "The design board" },
+  ],
+};
+
 export const sectionIds = ["home", "about", "coaches", "mindset", "gallery", "contact"];
 
 export const hero = {
@@ -236,7 +377,7 @@ export const gallery = [
 export const contact = {
   heading: "YOUR JOURNEY STARTS HERE.",
   text: "Ready to take the next step? Connect with our coaching team.",
-  inquiryTypes: ["Basketball Camp", "Training Schedule", "Coaching Inquiry", "Partnership", "Other"] as const,
+  inquiryTypes: ["Basketball Camp", "Training Schedule", "Coaching Inquiry", "Merch Order", "Partnership", "Other"] as const,
   ageGroups: ["Under 10", "10–12", "13–15", "16–18", "Adult / not applicable"] as const,
   guardianNote:
     "Inquiring for a child? Please have a parent or guardian submit this form and provide their own contact details. We don't ask for any unnecessary information about minors.",

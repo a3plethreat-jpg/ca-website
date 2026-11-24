@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { inquirySchema } from "../../lib/inquiry";
+import { mailProvider, sendMail } from "../../lib/mailer";
 
 export const runtime = "nodejs";
 
@@ -42,65 +43,89 @@ export async function POST(req: Request) {
   // Honeypot filled => pretend success, deliver nothing.
   if (d.website) return NextResponse.json({ ok: true });
 
-  const text = [
-    `Name: ${d.name}`,
-    `Email: ${d.email}`,
-    `Phone: ${d.phone || "-"}`,
-    `Inquiry type: ${d.inquiryType}`,
-    `Age group: ${d.ageGroup || "-"}`,
-    `Guardian confirmed: ${d.guardian ? "yes" : "no"}`,
-    "",
-    d.message,
-  ].join("\n");
+  const isOrder = d.inquiryType === "Merch Order";
+  const text = (
+    isOrder
+      ? [
+          "NEW MERCH ORDER — confirm the order, then send payment details.",
+          "",
+          `Name: ${d.name}`,
+          `Email: ${d.email}`,
+          `Phone: ${d.phone || "-"}`,
+          `Address: ${d.address || "-"}`,
+          `Pickup / delivery: ${d.fulfillment || "-"}`,
+          "",
+          d.message,
+          "",
+          "Next: confirm stock and the total, ask for payment, then send the online receipt and the delivery day.",
+        ]
+      : [
+          `Name: ${d.name}`,
+          `Email: ${d.email}`,
+          `Phone: ${d.phone || "-"}`,
+          `Inquiry type: ${d.inquiryType}`,
+          `Age group: ${d.ageGroup || "-"}`,
+          `Guardian confirmed: ${d.guardian ? "yes" : "no"}`,
+          "",
+          d.message,
+        ]
+  ).join("\n");
 
-  const key = process.env.RESEND_API_KEY;
   const defaultTo = process.env.INQUIRY_TO_EMAIL || "info@coachatriplethreat.com";
   const recipients = routeFor(d.inquiryType, defaultTo);
-  const to = recipients[0];
-  const from = process.env.INQUIRY_FROM_EMAIL;
-  if (!key || !from) {
+  if (!mailProvider()) {
     // No provider configured: log so nothing is silently lost during development.
-    console.warn("[inquiry] email not configured (RESEND_API_KEY / INQUIRY_FROM_EMAIL). Submission:\n" + text);
+    console.warn("[inquiry] email not configured (GMAIL_* or RESEND_API_KEY + INQUIRY_FROM_EMAIL). Submission:\n" + text);
     return NextResponse.json({ ok: true });
   }
 
   try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from,
-        to: recipients,
-        reply_to: d.email,
-        subject: `Camp inquiry — ${d.inquiryType} (${d.name})`,
-        text,
-      }),
+    await sendMail({
+      to: recipients,
+      replyTo: d.email,
+      subject: isOrder ? `Merch order — ${d.name} (${d.fulfillment})` : `Camp inquiry — ${d.inquiryType} (${d.name})`,
+      text,
     });
-    if (!res.ok) throw new Error(`provider ${res.status}`);
 
     // Auto-reply worker: acknowledge the sender. Best-effort — never fails the submission.
     try {
       const first = d.name.trim().split(/\s+/)[0];
-      const ack = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          from,
-          to: [d.email],
-          reply_to: to,
-          subject: "We got your message — CA Triple Threat Basketball Camp",
-          text: [
-            `Hi ${first},`,
-            "",
-            `Thanks for reaching out about "${d.inquiryType}". Our coaching team has received your inquiry and will reply as soon as possible.`,
-            "",
-            "You can reply to this email to add more details.",
-            "",
-            "— CA Triple Threat Basketball Camp",
-          ].join("\n"),
-        }),
+      await sendMail({
+        to: [d.email],
+        replyTo: recipients[0],
+        subject: isOrder
+          ? "We received your merch order — CA Triple Threat"
+          : "We got your message — CA Triple Threat Basketball Camp",
+        text: (isOrder
+          ? [
+              `Hi ${first},`,
+              "",
+              "Salamat! We received your order request:",
+              "",
+              d.message,
+              "",
+              `Pickup / delivery: ${d.fulfillment}`,
+              "",
+              "What happens next:",
+              "1. Our team confirms your order and sends you the payment details.",
+              "2. Once your payment is received, you get an online receipt and your delivery day.",
+              "3. Pick it up at practice, or receive it via J&T Express or Lalamove.",
+              "",
+              "This email is not a receipt. Please wait for our confirmation before paying.",
+              "",
+              "— CA Triple Threat Basketball Camp",
+            ]
+          : [
+              `Hi ${first},`,
+              "",
+              `Thanks for reaching out about "${d.inquiryType}". Our coaching team has received your inquiry and will reply as soon as possible.`,
+              "",
+              "You can reply to this email to add more details.",
+              "",
+              "— CA Triple Threat Basketball Camp",
+            ]
+        ).join("\n"),
       });
-      if (!ack.ok) console.warn("[inquiry] auto-reply failed", ack.status);
     } catch (err) {
       console.warn("[inquiry] auto-reply error", err);
     }

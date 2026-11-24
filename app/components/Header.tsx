@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { nav, site, sectionIds } from "../lib/content";
+import { merch, nav, site, sectionIds } from "../lib/content";
 import { scene, subscribe } from "../lib/scene";
 
 export default function Header() {
@@ -60,6 +60,15 @@ export default function Header() {
                 </li>
               );
             })}
+            <li>
+              <a
+                href={merch.path}
+                className="display text-[1.05rem] tracking-[.12em] text-red-text transition-colors hover:text-white"
+              >
+                {merch.label}
+                <span className="mt-1 block h-[2px] scale-x-0" />
+              </a>
+            </li>
           </ul>
         </nav>
         <button
@@ -95,6 +104,15 @@ export default function Header() {
               </a>
             </li>
           ))}
+          <li>
+            <a
+              href={merch.path}
+              onClick={() => setOpen(false)}
+              className="display block py-4 text-2xl tracking-[.08em] text-red-text"
+            >
+              {merch.label}
+            </a>
+          </li>
         </ul>
       </nav>
     </header>
