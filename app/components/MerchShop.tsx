@@ -156,7 +156,7 @@ function ProductCard({
         </div>
 
         <button type="button" onClick={add} className="btn btn-primary w-full" aria-describedby={!size ? `hint-${p.id}` : undefined}>
-          <span key={String(added)} className={added ? "merch-pop inline-block" : undefined}>{added ? "Added ✓" : "Add to request"}</span>
+          <span key={String(added)} className={added ? "merch-pop inline-block" : undefined}>{added ? "Added ✓" : "Add to order"}</span>
         </button>
         {!size && <p id={`hint-${p.id}`} className="-mt-2 text-xs text-silver">Choose a size first.</p>}
       </div>
@@ -183,8 +183,6 @@ export default function MerchShop() {
             "Merch order request:",
             ...items.map((i) => `- ${i.product} — ${i.color} — Size ${i.size} × ${i.qty} — ${peso(i.price * i.qty)}`),
             `Total: ${peso(items.reduce((n, i) => n + i.price * i.qty, 0))}`,
-            "",
-            "Pickup or delivery preference: ",
           ].join("\n")
         : "",
     [items],
@@ -204,6 +202,15 @@ export default function MerchShop() {
       return [...list, { ...item, key }];
     });
   }
+
+  const [orderInView, setOrderInView] = useState(false);
+  useEffect(() => {
+    const el = document.getElementById("order");
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setOrderInView(e.isIntersecting), { threshold: 0.15 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const count = items.reduce((n, i) => n + i.qty, 0);
   const total = items.reduce((n, i) => n + i.price * i.qty, 0);
@@ -254,15 +261,36 @@ export default function MerchShop() {
         </div>
       </section>
 
+      <section id="how-to-order" aria-labelledby="how-title" className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+        <p className="eyebrow text-red-text">Simple and safe</p>
+        <h2 id="how-title" className="display mt-2 text-5xl sm:text-6xl">How ordering works</h2>
+        <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {merch.steps.map((step, i) => (
+            <li key={step.title} className="panel relative p-5">
+              <span aria-hidden className="display block text-5xl leading-none text-white/15">{String(i + 1).padStart(2, "0")}</span>
+              <h3 className="display mt-3 text-xl tracking-[.06em]">
+                <span className="sr-only">Step {i + 1}: </span>
+                {step.title}
+              </h3>
+              <p className="mt-2 text-sm text-silver">{step.text}</p>
+              <span aria-hidden className={`absolute inset-x-0 top-0 h-[3px] ${i % 2 ? "bg-brand-red" : "bg-brand-green"}`} />
+            </li>
+          ))}
+        </ol>
+        <p className="mt-6 text-sm text-silver">
+          Pay only after we confirm your order. Our confirmation email is not a receipt — your online receipt comes after payment.
+        </p>
+      </section>
+
       <section id="order" aria-labelledby="order-title" className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1.4fr]">
         <div>
           <p className="eyebrow text-green-text">Order</p>
-          <h2 id="order-title" className="display mt-2 text-5xl sm:text-6xl">Your request</h2>
+          <h2 id="order-title" className="display mt-2 text-5xl sm:text-6xl">Your order</h2>
           <p className="mt-4 text-silver">
-            Add tees above, then send the request. The coaching team replies by email to confirm sizes, payment and pickup at camp.
+            Add tees above, then fill in your name, phone, address and email and submit. We&apos;ll confirm your order and send payment details.
           </p>
           {items.length ? (
-            <ul className="mt-6 divide-y divide-line border-y border-line" aria-label="Items in your request">
+            <ul className="mt-6 divide-y divide-line border-y border-line" aria-label="Items in your order">
               {items.map((i) => (
                 <li key={i.key} className="flex items-center justify-between gap-4 py-3">
                   <span>
@@ -281,19 +309,19 @@ export default function MerchShop() {
               </li>
             </ul>
           ) : (
-            <p className="mt-6 border border-dashed border-line p-4 text-sm text-silver">No tees added yet. You can also just describe what you want in the message.</p>
+            <p className="mt-6 border border-dashed border-line p-4 text-sm text-silver">No tees added yet. Pick a design and size above, or describe what you want in the order details.</p>
           )}
         </div>
-        <InquiryForm defaultType="Merch Order" label="Merch order request form" onSuccess={() => setItems([])} />
+        <InquiryForm variant="merch" defaultType="Merch Order" label="Merch order form" onSuccess={() => setItems([])} />
       </section>
 
-      {count > 0 && (
+      {count > 0 && !orderInView && (
         <a
           href="#order"
           className="btn btn-primary fixed bottom-5 left-1/2 z-40 -translate-x-1/2 shadow-lg shadow-black/50"
-          aria-label={`Review your request: ${count} item${count > 1 ? "s" : ""}, ${peso(total)}`}
+          aria-label={`Review your order: ${count} item${count > 1 ? "s" : ""}, ${peso(total)}`}
         >
-          Your request · {count} · {peso(total)}
+          Your order · {count} · {peso(total)}
         </a>
       )}
 

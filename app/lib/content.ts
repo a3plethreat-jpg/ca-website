@@ -16,8 +16,8 @@ export const nav = [
   { label: "Contact", href: "#contact" },
 ];
 
-// Camp merch (/merch). There's no online checkout: orders go through the inquiry form
-// ("Merch Order") and the team confirms sizes, payment and pickup by reply.
+// Camp merch (/merch). No online checkout: the visitor sends an order request ("Merch Order"),
+// the team confirms it and asks for payment, then sends an online receipt and the delivery day.
 export type MerchView = { src: string; label: string; alt: string };
 export type MerchColor = { name: string; swatch: string; views: MerchView[] };
 export type MerchProduct = {
@@ -43,6 +43,14 @@ export const merch = {
   path: "/merch",
   lines: ["Signature", "Faith", "Camp"] as const,
   sizes: ["S", "M", "L", "XL", "XXL", "XXXL"],
+  fulfillment: ["Pick up at practice", "J&T Express delivery", "Lalamove delivery"] as const,
+  steps: [
+    { title: "Pick your shirt", text: "Choose a design, color and size, and add it to your order." },
+    { title: "Send your details", text: "Fill in your name, phone, address and email, then submit the order." },
+    { title: "We confirm", text: "Our team checks stock, confirms your order and sends payment details." },
+    { title: "Pay, get your receipt", text: "Once payment is received, you get an online receipt and your delivery day." },
+    { title: "Receive it", text: "Pick it up at practice, or get it delivered via J&T Express or Lalamove." },
+  ],
   products: [
     {
       id: "coach-a-3d",

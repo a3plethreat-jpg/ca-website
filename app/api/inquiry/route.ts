@@ -43,16 +43,33 @@ export async function POST(req: Request) {
   // Honeypot filled => pretend success, deliver nothing.
   if (d.website) return NextResponse.json({ ok: true });
 
-  const text = [
-    `Name: ${d.name}`,
-    `Email: ${d.email}`,
-    `Phone: ${d.phone || "-"}`,
-    `Inquiry type: ${d.inquiryType}`,
-    `Age group: ${d.ageGroup || "-"}`,
-    `Guardian confirmed: ${d.guardian ? "yes" : "no"}`,
-    "",
-    d.message,
-  ].join("\n");
+  const isOrder = d.inquiryType === "Merch Order";
+  const text = (
+    isOrder
+      ? [
+          "NEW MERCH ORDER — confirm the order, then send payment details.",
+          "",
+          `Name: ${d.name}`,
+          `Email: ${d.email}`,
+          `Phone: ${d.phone || "-"}`,
+          `Address: ${d.address || "-"}`,
+          `Pickup / delivery: ${d.fulfillment || "-"}`,
+          "",
+          d.message,
+          "",
+          "Next: confirm stock and the total, ask for payment, then send the online receipt and the delivery day.",
+        ]
+      : [
+          `Name: ${d.name}`,
+          `Email: ${d.email}`,
+          `Phone: ${d.phone || "-"}`,
+          `Inquiry type: ${d.inquiryType}`,
+          `Age group: ${d.ageGroup || "-"}`,
+          `Guardian confirmed: ${d.guardian ? "yes" : "no"}`,
+          "",
+          d.message,
+        ]
+  ).join("\n");
 
   const defaultTo = process.env.INQUIRY_TO_EMAIL || "info@coachatriplethreat.com";
   const recipients = routeFor(d.inquiryType, defaultTo);
@@ -66,7 +83,7 @@ export async function POST(req: Request) {
     await sendMail({
       to: recipients,
       replyTo: d.email,
-      subject: `Camp inquiry — ${d.inquiryType} (${d.name})`,
+      subject: isOrder ? `Merch order — ${d.name} (${d.fulfillment})` : `Camp inquiry — ${d.inquiryType} (${d.name})`,
       text,
     });
 
@@ -76,16 +93,38 @@ export async function POST(req: Request) {
       await sendMail({
         to: [d.email],
         replyTo: recipients[0],
-        subject: "We got your message — CA Triple Threat Basketball Camp",
-        text: [
-          `Hi ${first},`,
-          "",
-          `Thanks for reaching out about "${d.inquiryType}". Our coaching team has received your inquiry and will reply as soon as possible.`,
-          "",
-          "You can reply to this email to add more details.",
-          "",
-          "— CA Triple Threat Basketball Camp",
-        ].join("\n"),
+        subject: isOrder
+          ? "We received your merch order — CA Triple Threat"
+          : "We got your message — CA Triple Threat Basketball Camp",
+        text: (isOrder
+          ? [
+              `Hi ${first},`,
+              "",
+              "Salamat! We received your order request:",
+              "",
+              d.message,
+              "",
+              `Pickup / delivery: ${d.fulfillment}`,
+              "",
+              "What happens next:",
+              "1. Our team confirms your order and sends you the payment details.",
+              "2. Once your payment is received, you get an online receipt and your delivery day.",
+              "3. Pick it up at practice, or receive it via J&T Express or Lalamove.",
+              "",
+              "This email is not a receipt. Please wait for our confirmation before paying.",
+              "",
+              "— CA Triple Threat Basketball Camp",
+            ]
+          : [
+              `Hi ${first},`,
+              "",
+              `Thanks for reaching out about "${d.inquiryType}". Our coaching team has received your inquiry and will reply as soon as possible.`,
+              "",
+              "You can reply to this email to add more details.",
+              "",
+              "— CA Triple Threat Basketball Camp",
+            ]
+        ).join("\n"),
       });
     } catch (err) {
       console.warn("[inquiry] auto-reply error", err);

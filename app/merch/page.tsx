@@ -52,11 +52,11 @@ export default function MerchPage() {
             </h1>
             <span aria-hidden className="rule mt-6 block w-40" />
             <p className="mt-6 max-w-xl text-lg text-silver">
-              Wear what the camp stands for. Camp tees {peso(basePrice)}, washed-pink faith tees {peso(faithPrice)}. Pick a design, color and size, add it to your request, and the coaching team will confirm payment and pickup.
+              Wear what the camp stands for. Camp tees {peso(basePrice)}, washed-pink faith tees {peso(faithPrice)}. Pick a design and size, send your order, and we confirm it before you pay. Pick up at practice or get it delivered via J&T or Lalamove.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <a href="#collection" className="btn btn-primary">Shop the collection</a>
-              <a href="#order" className="btn btn-ghost">How ordering works</a>
+              <a href="#how-to-order" className="btn btn-ghost">How ordering works</a>
             </div>
             </div>
             <div className="rise">

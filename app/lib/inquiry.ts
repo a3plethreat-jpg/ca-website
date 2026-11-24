@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { contact, NO_AGE } from "./content";
+import { contact, merch, NO_AGE } from "./content";
 
 export const inquirySchema = z
   .object({
@@ -15,6 +15,9 @@ export const inquirySchema = z
     inquiryType: z.enum(contact.inquiryTypes, { message: "Please choose an inquiry type." }),
     ageGroup: z.enum(contact.ageGroups).optional().or(z.literal("")),
     guardian: z.boolean().optional(),
+    // Merch orders only (required there; see below).
+    address: z.string().trim().max(300).optional().or(z.literal("")),
+    fulfillment: z.enum(merch.fulfillment).optional().or(z.literal("")),
     message: z
       .string()
       .trim()
@@ -26,6 +29,15 @@ export const inquirySchema = z
   .refine((v) => !v.ageGroup || v.ageGroup === NO_AGE || v.guardian === true, {
     path: ["guardian"],
     message: "A parent or guardian must confirm this inquiry for a minor.",
+  })
+  .superRefine((v, ctx) => {
+    if (v.inquiryType !== "Merch Order") return;
+    if ((v.phone ?? "").replace(/\D/g, "").length < 7)
+      ctx.addIssue({ code: "custom", path: ["phone"], message: "Please enter a mobile number so we can confirm your order." });
+    if ((v.address ?? "").length < 10)
+      ctx.addIssue({ code: "custom", path: ["address"], message: "Please enter your full address (street, barangay, city)." });
+    if (!v.fulfillment)
+      ctx.addIssue({ code: "custom", path: ["fulfillment"], message: "Choose pickup or a delivery option." });
   });
 
 export type InquiryInput = z.infer<typeof inquirySchema>;
