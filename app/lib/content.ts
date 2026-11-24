@@ -42,7 +42,7 @@ export const merch = {
   },
   path: "/merch",
   lines: ["Signature", "Faith", "Camp"] as const,
-  sizes: ["Youth S", "Youth M", "Youth L", "S", "M", "L", "XL", "2XL", "3XL"],
+  sizes: ["S", "M", "L", "XL", "XXL", "XXXL"],
   products: [
     {
       id: "coach-a-3d",
