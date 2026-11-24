@@ -55,6 +55,33 @@ export async function POST(req: Request) {
       }),
     });
     if (!res.ok) throw new Error(`provider ${res.status}`);
+
+    // Auto-reply worker: acknowledge the sender. Best-effort — never fails the submission.
+    try {
+      const first = d.name.trim().split(/\s+/)[0];
+      const ack = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from,
+          to: [d.email],
+          reply_to: to,
+          subject: "We got your message — CA Triple Threat Basketball Camp",
+          text: [
+            `Hi ${first},`,
+            "",
+            `Thanks for reaching out about "${d.inquiryType}". Our coaching team has received your inquiry and will reply as soon as possible.`,
+            "",
+            "You can reply to this email to add more details.",
+            "",
+            "— CA Triple Threat Basketball Camp",
+          ].join("\n"),
+        }),
+      });
+      if (!ack.ok) console.warn("[inquiry] auto-reply failed", ack.status);
+    } catch (err) {
+      console.warn("[inquiry] auto-reply error", err);
+    }
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[inquiry] send failed", err);
