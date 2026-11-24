@@ -4,7 +4,7 @@ export const site = {
   tagline: "Built to compete.",
   description:
     "Developing basketball skills, discipline, confidence, and a championship mindset through purposeful training.",
-  url: "https://preview.coachatriplethreat.com",
+  url: "https://coachatriplethreat.com",
 };
 
 export const nav = [
