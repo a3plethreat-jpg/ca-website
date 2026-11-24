@@ -9,10 +9,12 @@ type RequestItem = { key: string; product: string; color: string; size: string; 
 
 function ProductCard({
   p,
+  order,
   onAdd,
   onZoom,
 }: {
   p: MerchProduct;
+  order: number;
   onAdd: (item: Omit<RequestItem, "key">) => void;
   onZoom: (v: MerchView, title: string) => void;
 }) {
@@ -21,6 +23,22 @@ function ProductCard({
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
+  const [seen, setSeen] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+
+  // Reveal each card as it scrolls into view (CSS handles reduced motion).
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        setSeen(true);
+        io.disconnect();
+      }
+    }, { rootMargin: "0px 0px -10% 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   const color = p.colors[colorIdx];
   const view = color.views[Math.min(viewIdx, color.views.length - 1)];
   const title = `${p.name} — ${color.name}`;
@@ -33,7 +51,13 @@ function ProductCard({
   }
 
   return (
-    <article className="panel flex flex-col overflow-hidden" aria-labelledby={`t-${p.id}`}>
+    <article
+      ref={ref}
+      data-in={seen}
+      style={{ ["--d" as string]: `${order * 90}ms` }}
+      className="merch-card panel flex flex-col overflow-hidden"
+      aria-labelledby={`t-${p.id}`}
+    >
       <button
         type="button"
         onClick={() => onZoom(view, title)}
@@ -126,7 +150,7 @@ function ProductCard({
         </div>
 
         <button type="button" onClick={add} className="btn btn-primary w-full" aria-describedby={!size ? `hint-${p.id}` : undefined}>
-          {added ? "Added ✓" : "Add to request"}
+          <span key={String(added)} className={added ? "merch-pop inline-block" : undefined}>{added ? "Added ✓" : "Add to request"}</span>
         </button>
         {!size && <p id={`hint-${p.id}`} className="-mt-2 text-xs text-silver">Choose a size first.</p>}
       </div>
@@ -200,8 +224,8 @@ export default function MerchShop() {
         </div>
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {shown.map((p) => (
-            <ProductCard key={p.id} p={p} onAdd={add} onZoom={(v, title) => setZoom({ v, title })} />
+          {shown.map((p, i) => (
+            <ProductCard key={`${line}-${p.id}`} p={p} order={i} onAdd={add} onZoom={(v, title) => setZoom({ v, title })} />
           ))}
         </div>
       </section>

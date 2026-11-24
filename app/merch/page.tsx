@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Footer from "../components/Footer";
 import MerchShop from "../components/MerchShop";
+import MerchHeroFrame from "../components/merch/MerchHeroFrame";
 import { site } from "../lib/content";
 
 export const metadata: Metadata = {
@@ -39,7 +40,8 @@ export default function MerchPage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/merch/logo-lineup.webp" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-30" />
           <div className="absolute inset-0 bg-gradient-to-r from-bg via-bg/85 to-bg/30" />
-          <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28">
+          <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:py-24">
+            <div>
             <p className="eyebrow text-green-text">Official camp apparel</p>
             <h1 className="display mt-4 text-6xl leading-[.9] sm:text-8xl">
               Play hard.<br />
@@ -52,6 +54,10 @@ export default function MerchPage() {
             <div className="mt-8 flex flex-wrap gap-4">
               <a href="#collection" className="btn btn-primary">Shop the collection</a>
               <a href="#order" className="btn btn-ghost">How ordering works</a>
+            </div>
+            </div>
+            <div className="rise">
+              <MerchHeroFrame />
             </div>
           </div>
         </section>

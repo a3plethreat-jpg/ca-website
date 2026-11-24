@@ -750,3 +750,37 @@ video.jumbo-video:fullscreen {
   .live-screen { animation: fade var(--dur-short) both; }
   .live-ticker { animation: none; }
 }
+
+/* ---- Merch page motion ---- */
+.merch-card {
+  transition:
+    opacity var(--dur-long) var(--ease-brand) var(--d, 0ms),
+    transform var(--dur-long) var(--ease-brand) var(--d, 0ms),
+    border-color var(--dur-short) var(--ease-standard);
+}
+.merch-card[data-in="false"] {
+  opacity: 0;
+  transform: translateY(28px) scale(0.98);
+}
+.merch-card:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.merch-pop {
+  animation: merch-pop var(--dur-medium) var(--ease-brand);
+}
+@keyframes merch-pop {
+  0% { transform: scale(0.85); }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .merch-card,
+  .merch-card[data-in="false"] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .merch-pop {
+    animation: none;
+  }
+}
