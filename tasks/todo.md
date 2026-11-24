@@ -26,5 +26,6 @@
 - [x] Merch sizes (owner): S, M, L, XL, XXL, XXXL
 - [x] Merch ordering flow (owner, 2026-11-24): pick design + size -> name, phone, address, email -> submit; team confirms and asks for payment first; online receipt + delivery day after payment; pickup at practice or delivery via J&T Express / Lalamove. Phone, address and pickup/delivery are required for "Merch Order" (client + server). Staff email and customer auto-reply follow the flow.
 - [ ] Merch: payment channel details (e.g. GCash number) to include in the confirmation reply
+- [x] Mobile hero (2026-11-24): corner live-screen replaced with a 3D-animated Dudoy popup (CSS perspective/rotateY/rotateX showcase spin + pulsing glow, jump.webp — transparent, celebratory), full-card link to /merch, "NEW DROP" badge + "SHOP THE MERCH" CTA. Desktop/tablet (>=768px) unchanged — still shows the live stream/replay screen. Verified: no video/iframe mounted on phones, click routes to /merch, reduced-motion gets a static tilt (no spin).
 - [ ] Decide on porting the optional 3D arena scene
 - [ ] Configure email delivery (Resend) and real live-stream URL

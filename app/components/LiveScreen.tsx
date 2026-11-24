@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { gameDay, liveScreen } from "../lib/content";
+import { gameDay, liveScreen, merch } from "../lib/content";
 
 /** Only allow embeds from known live-stream hosts; force muted autoplay. */
 function safeEmbed(raw: string): string | null {
@@ -78,13 +78,23 @@ export default function LiveScreen() {
   const bigRef = useRef<HTMLVideoElement>(null);
   const [expanded, setExpanded] = useState(false);
   const [reduced, setReduced] = useState(false);
+  const [mobile, setMobile] = useState(false);
 
   useEffect(() => setReduced(matchMedia("(prefers-reduced-motion: reduce)").matches), []);
+
+  // Phones get the Dudoy merch popup instead of the broadcast screen (see render below).
+  useEffect(() => {
+    const mq = matchMedia("(max-width: 767px)");
+    const sync = () => setMobile(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   // play only while on screen + tab visible
   useEffect(() => {
     const v = videoRef.current;
-    if (!v || reduced) return;
+    if (!v || reduced || mobile) return;
     let visible = true;
     const sync = () => {
       if (visible && !document.hidden && !expanded) v.play().catch(() => {});
@@ -154,6 +164,39 @@ export default function LiveScreen() {
       gameDay.games.map((g) => `${g.label} ${g.division}: CA TRIPLE THREAT VS ${g.opponent}`).join("  ·  ") + "  ·  "
     : "";
   const ticker = `${schedule}${liveScreen.ticker}  ·  `;
+
+  if (mobile) {
+    // Mobile hero: no stream, no video weight — a 3D Dudoy popup inviting a tap through to the merch store.
+    return (
+      <div className="live-screen absolute" data-testid="live-screen" data-motion="showpiece">
+        <span aria-hidden className="live-cable left-[14%]" />
+        <span aria-hidden className="live-cable right-[14%]" />
+        <a
+          href={merch.path}
+          data-testid="merch-popup"
+          aria-label="Shop Triple Threat merch, picked by Dudoy. Opens the merch store."
+          className="merch-popup-frame group relative block aspect-square w-full overflow-hidden rounded-xl"
+        >
+          <span aria-hidden className="merch-popup-glow pointer-events-none absolute inset-0" />
+          <div className="merch-popup-stage pointer-events-none absolute inset-0 grid place-items-center p-[12%]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/dudoy/jump.webp"
+              alt=""
+              className="merch-popup-spin h-full w-full object-contain drop-shadow-[0_16px_20px_rgba(0,0,0,.6)]"
+            />
+          </div>
+          <span aria-hidden className="merch-popup-ring pointer-events-none absolute inset-0 rounded-xl" />
+          <span className="display pointer-events-none absolute left-2 top-2 rounded-sm bg-brand-red px-2 py-[.35em] text-[10px] tracking-widest text-white shadow-[0_0_14px_rgba(231,25,32,.7)]">
+            NEW DROP
+          </span>
+          <span className="display pointer-events-none absolute inset-x-2 bottom-2 flex items-center justify-center gap-1 rounded-sm bg-black/80 px-2 py-2 text-[11px] tracking-widest text-white ring-1 ring-white/25 transition-colors group-active:bg-brand-green">
+            SHOP THE MERCH →
+          </span>
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div
