@@ -306,9 +306,11 @@ export const gameDay = {
   // While delayed, "UP NEXT" is the first game not done (instead of going by the clock).
   // Set playing on the game in progress: the chip then reads "NOW PLAYING" and the ticker leads with it.
   delayed: true,
+  // Set ended when the day's games are over: the screen goes back to normal before midnight.
+  ended: true,
   games: [
-    { time: "10:30", label: "10:30 AM", division: "17U", opponent: "LAGUNDI", done: false, playing: true },
-    { time: "11:45", label: "11:45 AM", division: "15U", opponent: "CMB SPORTS B", done: false, playing: false },
+    { time: "10:30", label: "10:30 AM", division: "17U", opponent: "LAGUNDI", done: true, playing: false },
+    { time: "11:45", label: "11:45 AM", division: "15U", opponent: "CMB SPORTS B", done: true, playing: false },
   ],
 };
 

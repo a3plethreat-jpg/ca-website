@@ -150,7 +150,7 @@ export default function LiveScreen() {
       const ymd = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
       const hm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
       setToday({
-        on: ymd === gameDay.date,
+        on: ymd === gameDay.date && !gameDay.ended,
         next: gameDay.delayed ? gameDay.games.find((g) => !g.done) : gameDay.games.find((g) => g.time > hm),
       });
     };
